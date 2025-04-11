@@ -6,14 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name="admin")
 @Getter
 @Setter
-
+@NoArgsConstructor
+@AllArgsConstructor
 public class Administrador {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,12 +26,6 @@ public class Administrador {
 	@Column(length  = 100, nullable = false)
 	private String senha;
 	
-	public Administrador() {}
-	public Administrador(String email, String senha) {
-		super();
-		this.email = email;
-		this.senha = senha;
-	}
 	@Override
 	public String toString() {
 		return "Administrador [id=" + id + ", email=" + email + ", senha=" + senha + "]";
