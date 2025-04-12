@@ -22,11 +22,10 @@ public class AdministradorController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@PostMapping("/admin")
-	public ResponseEntity<AdministradorDTO> postAdmin(@RequestBody Administrador admin){
-		admin.setSenha(passwordEncoder.encode(admin.getSenha()));
-		Administrador save = repository.save(admin);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(save));
-		
+	public ResponseEntity<AdministradorDTO> postAdmin(@RequestBody Administrador admin) {
+	    admin.setSenha(passwordEncoder.encode(admin.getSenha()));
+	    Administrador savedAdmin = repository.save(admin);
+	    return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(savedAdmin));
 	}
 	@GetMapping("/admin/listar")
 	public List<AdministradorDTO> getAdmins(){

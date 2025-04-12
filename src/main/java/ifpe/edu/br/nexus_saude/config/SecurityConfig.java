@@ -9,16 +9,17 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+	
 	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 	
 	 @Bean
 	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	        http
 	            .authorizeHttpRequests(auth -> auth
-	                .anyRequest().authenticated()
+	                .anyRequest().permitAll()
 	            )
 	            .csrf(csrf -> csrf.disable())
 	            .httpBasic(httpBasic -> {});  
