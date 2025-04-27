@@ -3,6 +3,10 @@ package ifpe.edu.br.nexus_saude.dto;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +17,17 @@ public class MedicoDTO {
     private String email;
     private String crm;
     private String especialidade;
+    private String cpf;
+    private String sexo;
+    private String telefoneConsultorio;
+    private Integer tempoConsulta;
+    private String tipo;
+    private String uf;
+    private BigDecimal valorConsulta;
+    private LocalDate dataNascimento;
+    private LocalDateTime dataCadastro;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public MedicoDTO(Medico medico) {
         this.id = medico.getId();
@@ -20,5 +35,16 @@ public class MedicoDTO {
         this.email = medico.getEmail();
         this.crm = medico.getCrm();
         this.especialidade = medico.getEspecialidade();
+        this.cpf = medico.getCpf();
+        this.sexo = medico.getSexo();
+        this.telefoneConsultorio = medico.getTelefoneConsultorio();
+        this.tempoConsulta = medico.getTempoConsulta();
+        this.tipo = medico.getTipo();
+        this.uf = medico.getUf();
+        this.valorConsulta = medico.getValorConsulta();
+        this.dataNascimento = medico.getDataNascimento();
+        this.dataCadastro = medico.getDataCadastro();
+        this.createdAt = medico.getCreatedAt();
+        this.updatedAt = medico.getUpdatedAt();
     }
 }
