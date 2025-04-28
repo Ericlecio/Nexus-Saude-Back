@@ -13,6 +13,7 @@ import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RestController
+@RequestMapping("/Medico")
 public class MedicoController {
 
     @Autowired
