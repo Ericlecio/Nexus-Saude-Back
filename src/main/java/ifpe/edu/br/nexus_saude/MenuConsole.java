@@ -1,6 +1,8 @@
 package ifpe.edu.br.nexus_saude;
 
+import ifpe.edu.br.nexus_saude.model.Paciente;
 import ifpe.edu.br.nexus_saude.model.Medico;
+import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
 import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -9,18 +11,72 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 @Component
-public class MenuConsoleMedico implements CommandLineRunner {
+public class MenuConsole implements CommandLineRunner {
+
+    @Autowired
+    private PacienteRepository pacienteRepository;
 
     @Autowired
     private MedicoRepository medicoRepository;
 
     private final Scanner scanner = new Scanner(System.in);
 
+    // Data Formatter para validar a data no formato correto
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     @Override
     public void run(String... args) {
+        int opcao;
+        do {
+            System.out.println("\n--- MENU PRINCIPAL ---");
+            System.out.println("1 - Menu Paciente");
+            System.out.println("2 - Menu Médico");
+            System.out.println("0 - Sair");
+            System.out.print("Escolha uma opção: ");
+            opcao = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcao) {
+                case 1 -> menuPaciente();  // Chama o menu do paciente
+                case 2 -> menuMedico();    // Chama o menu do médico
+                case 0 -> System.out.println("Encerrando...");
+                default -> System.out.println("Opção inválida.");
+            }
+        } while (opcao != 0);
+    }
+
+    // Menu Paciente
+    private void menuPaciente() {
+        int opcao;
+        do {
+            System.out.println("\n--- MENU PACIENTE ---");
+            System.out.println("1 - Cadastrar paciente");
+            System.out.println("2 - Listar pacientes");
+            System.out.println("3 - Atualizar paciente");
+            System.out.println("4 - Deletar paciente");
+            System.out.println("0 - Voltar");
+            System.out.print("Escolha uma opção: ");
+            opcao = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcao) {
+                case 1 -> cadastrarPaciente();
+                case 2 -> listarPacientes();
+                case 3 -> atualizarPaciente();
+                case 4 -> deletarPaciente();
+                case 0 -> System.out.println("Voltando...");
+                default -> System.out.println("Opção inválida.");
+            }
+        } while (opcao != 0);
+    }
+
+    // Menu Médico
+    private void menuMedico() {
         int opcao;
         do {
             System.out.println("\n--- MENU MÉDICO ---");
@@ -28,7 +84,7 @@ public class MenuConsoleMedico implements CommandLineRunner {
             System.out.println("2 - Listar médicos");
             System.out.println("3 - Atualizar médico");
             System.out.println("4 - Deletar médico");
-            System.out.println("0 - Sair");
+            System.out.println("0 - Voltar");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine();
@@ -38,12 +94,112 @@ public class MenuConsoleMedico implements CommandLineRunner {
                 case 2 -> listarMedicos();
                 case 3 -> atualizarMedico();
                 case 4 -> deletarMedico();
-                case 0 -> System.out.println("Encerrando...");
+                case 0 -> System.out.println("Voltando...");
                 default -> System.out.println("Opção inválida.");
             }
         } while (opcao != 0);
     }
 
+    // Funções do menu Paciente
+    private void cadastrarPaciente() {
+        Paciente paciente = new Paciente();
+
+        System.out.print("Nome Completo: ");
+        paciente.setNomeCompleto(scanner.nextLine());
+
+        System.out.print("Email: ");
+        paciente.setEmail(scanner.nextLine().toLowerCase());
+
+        System.out.print("Telefone (com DDD): ");
+        paciente.setTelefone(scanner.nextLine());
+
+        System.out.print("CPF: ");
+        paciente.setCpf(scanner.nextLine());
+
+        System.out.print("Plano de Saúde: ");
+        paciente.setPlanoSaude(scanner.nextLine());
+
+        System.out.print("Data de Nascimento (AAAA-MM-DD): ");
+        paciente.setDataNascimento(validarDataNascimento(scanner.nextLine()));
+
+        paciente.setDataCadastro(LocalDateTime.now());
+        paciente.setCreatedAt(LocalDateTime.now());
+
+        pacienteRepository.save(paciente);
+        System.out.println("Paciente cadastrado com sucesso!");
+    }
+
+    private LocalDate validarDataNascimento(String dataNascimentoStr) {
+        try {
+            return LocalDate.parse(dataNascimentoStr, DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            System.out.println("Erro: A data de nascimento deve estar no formato 'AAAA-MM-DD'.");
+            return null;  // Retorna null caso a data não seja válida
+        }
+    }
+
+    private void listarPacientes() {
+        System.out.println("\n--- Lista de Pacientes ---");
+        pacienteRepository.findAll().forEach(p -> {
+            System.out.println("ID: " + p.getPacienteId());
+            System.out.println("Nome Completo: " + p.getNomeCompleto());
+            System.out.println("Email: " + p.getEmail());
+            System.out.println("Telefone: " + p.getTelefone());
+            System.out.println("CPF: " + p.getCpf());
+            System.out.println("Plano de Saúde: " + p.getPlanoSaude());
+            System.out.println("Data de Nascimento: " + p.getDataNascimento());
+            System.out.println("Data de Cadastro: " + p.getDataCadastro());
+            System.out.println("-----------------------------");
+        });
+    }
+
+    private void atualizarPaciente() {
+        System.out.print("ID do paciente para atualizar: ");
+        String pacienteId = scanner.nextLine();
+
+        Paciente paciente = pacienteRepository.findById(pacienteId).orElse(null);
+
+        if (paciente != null) {
+            System.out.print("Novo nome completo (" + paciente.getNomeCompleto() + "): ");
+            paciente.setNomeCompleto(scanner.nextLine());
+
+            System.out.print("Novo email (" + paciente.getEmail() + "): ");
+            paciente.setEmail(scanner.nextLine().toLowerCase());
+
+            System.out.print("Novo telefone (" + paciente.getTelefone() + "): ");
+            paciente.setTelefone(scanner.nextLine());
+
+            System.out.print("Novo CPF (" + paciente.getCpf() + "): ");
+            paciente.setCpf(scanner.nextLine());
+
+            System.out.print("Novo plano de saúde (" + paciente.getPlanoSaude() + "): ");
+            paciente.setPlanoSaude(scanner.nextLine());
+
+            System.out.print("Nova data de nascimento (" + paciente.getDataNascimento() + "): ");
+            paciente.setDataNascimento(validarDataNascimento(scanner.nextLine()));
+
+            paciente.setUpdatedAt(LocalDateTime.now());
+
+            pacienteRepository.save(paciente);
+            System.out.println("Paciente atualizado com sucesso!");
+        } else {
+            System.out.println("Paciente não encontrado.");
+        }
+    }
+
+    private void deletarPaciente() {
+        System.out.print("ID do paciente para deletar: ");
+        String pacienteId = scanner.nextLine();
+
+        if (pacienteRepository.existsById(pacienteId)) {
+            pacienteRepository.deleteById(pacienteId);
+            System.out.println("Paciente deletado com sucesso!");
+        } else {
+            System.out.println("Paciente não encontrado.");
+        }
+    }
+
+    // Funções do menu Médico
     private void cadastrarMedico() {
         Medico medico = new Medico();
 
