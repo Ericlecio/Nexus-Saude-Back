@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
 import ifpe.edu.br.nexus_saude.model.Paciente;
 import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/Paciente")
 public class PacienteController {
@@ -18,7 +18,7 @@ public class PacienteController {
     @Autowired
     private PacienteRepository repository;
 
-    @PostMapping("/paciente")
+    @PostMapping("/paciente/inserir")
     public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
         paciente.setEmail(paciente.getEmail().toLowerCase());
         Paciente savedPaciente = repository.save(paciente);

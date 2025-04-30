@@ -12,6 +12,7 @@ import ifpe.edu.br.nexus_saude.model.Medico;
 import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/Medico")
 public class MedicoController {
@@ -22,7 +23,7 @@ public class MedicoController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/medico")
+    @PostMapping("/medico/inserir")
 public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
     medico.setSenha(passwordEncoder.encode(medico.getSenha()));
     medico.setEmail(medico.getEmail().toLowerCase());
