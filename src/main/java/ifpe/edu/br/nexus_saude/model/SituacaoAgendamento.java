@@ -16,10 +16,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SituacaoAgendamento {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "situacao_id")
 	private Integer situacaoId;
-	
+	@Column(nullable = false)
+	private String descricao;
 }
