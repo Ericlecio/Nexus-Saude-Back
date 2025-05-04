@@ -11,31 +11,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "log_alteracoes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuarios {
+public class LogAlteracoes {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "usuario_id")
-    private Integer usuarioId;
+    @Column(name = "log_id")
+    private Integer logId;
 
     @Column(nullable = false, length = 100)
-    private String nome;
-
-    @Column(nullable = false, unique = true)
-    private String email;
+    private String entidade;
 
     @Column(nullable = false)
-    private String senhaHash;
+    private String registroId;
 
-    @Column(nullable = false, length = 50)
-    private String perfil;
-
-    @Column(nullable = false)
-    private String createdAt;
+    @Column(nullable = false, length = 100)
+    private String usuarioResponsavel;
 
     @Column(nullable = false)
-    private String updatedAt;
+    private String dataAlteracao;
+
+    @Column(nullable = false)
+    private String alteracao;
 }
