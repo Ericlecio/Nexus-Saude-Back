@@ -27,6 +27,7 @@ public class AdministradorController {
 	private AdministradorRepository repository;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
 	@PostMapping("/admin")
 	public ResponseEntity<AdministradorDTO> postAdmin(@RequestBody Administrador admin) {
 		admin.setSenha(passwordEncoder.encode(admin.getSenha()));
@@ -41,28 +42,28 @@ public class AdministradorController {
 				.toList();
 	}
 
-//Atualizar um administrador
-@PutMapping("/admin/{id}")
-public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id, @RequestBody Administrador adminDetails) {
-	return repository.findById(id)
-			.map(admin -> {
-				admin.setEmail(adminDetails.getEmail());
-				if (adminDetails.getSenha() != null && !adminDetails.getSenha().isEmpty()) {
-					admin.setSenha(passwordEncoder.encode(adminDetails.getSenha()));
-				}
-				Administrador updatedAdmin = repository.save(admin);
-				return ResponseEntity.ok(new AdministradorDTO(updatedAdmin));
-			})
-			.orElse(ResponseEntity.notFound().build());
-}
+	//Atualizar um administrador
+	@PutMapping("/admin/{id}")
+	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id, @RequestBody Administrador adminDetails) {
+		return repository.findById(id)
+				.map(admin -> {
+					admin.setEmail(adminDetails.getEmail());
+					if (adminDetails.getSenha() != null && !adminDetails.getSenha().isEmpty()) {
+						admin.setSenha(passwordEncoder.encode(adminDetails.getSenha()));
+					}
+					Administrador updatedAdmin = repository.save(admin);
+					return ResponseEntity.ok(new AdministradorDTO(updatedAdmin));
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
 
-//Deletar um administrador
-@DeleteMapping("/admin/{id}")
-public ResponseEntity<Void> deleteAdmin(@PathVariable Integer id) {
-	return repository.findById(id)
-			.map(admin -> {
-				repository.delete(admin);
-				return ResponseEntity.noContent().<Void>build();
-			})
-			.orElse(ResponseEntity.notFound().build());
-}}
+	//Deletar um administrador
+	@DeleteMapping("/admin/{id}")
+	public ResponseEntity<Void> deleteAdmin(@PathVariable Integer id) {
+		return repository.findById(id)
+				.map(admin -> {
+					repository.delete(admin);
+					return ResponseEntity.noContent().<Void>build();
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}}
