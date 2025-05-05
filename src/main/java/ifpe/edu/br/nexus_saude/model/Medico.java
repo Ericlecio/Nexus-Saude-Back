@@ -41,10 +41,7 @@ public class Medico {
     @Column(length = 20)
     private String telefoneConsultorio;
 
-    private Integer tempoConsulta; // minutos
-
-    @Column(length = 20)
-    private String tipo;
+    private Integer tempoConsulta; 
 
     @Column(length = 2)
     private String uf;

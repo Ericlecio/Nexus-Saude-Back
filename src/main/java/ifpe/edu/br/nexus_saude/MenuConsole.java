@@ -231,9 +231,6 @@ public class MenuConsole implements CommandLineRunner {
         medico.setTempoConsulta(scanner.nextInt());
         scanner.nextLine();
 
-        System.out.print("Tipo: ");
-        medico.setTipo(scanner.nextLine());
-
         System.out.print("UF: ");
         medico.setUf(scanner.nextLine().toUpperCase());
 
@@ -263,7 +260,6 @@ public class MenuConsole implements CommandLineRunner {
             System.out.println("Sexo: " + m.getSexo());
             System.out.println("Telefone Consultório: " + m.getTelefoneConsultorio());
             System.out.println("Tempo de Consulta: " + m.getTempoConsulta() + " min");
-            System.out.println("Tipo: " + m.getTipo());
             System.out.println("UF: " + m.getUf());
             System.out.println("Valor da Consulta: " + m.getValorConsulta());
             System.out.println("Data de Nascimento: " + m.getDataNascimento());
@@ -307,9 +303,6 @@ public class MenuConsole implements CommandLineRunner {
             System.out.print("Novo tempo de consulta (" + medico.getTempoConsulta() + " min): ");
             medico.setTempoConsulta(scanner.nextInt());
             scanner.nextLine();
-
-            System.out.print("Novo tipo (" + medico.getTipo() + "): ");
-            medico.setTipo(scanner.nextLine());
 
             System.out.print("Nova UF (" + medico.getUf() + "): ");
             medico.setUf(scanner.nextLine().toUpperCase());

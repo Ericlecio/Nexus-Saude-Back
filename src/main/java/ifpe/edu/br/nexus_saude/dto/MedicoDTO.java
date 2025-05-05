@@ -21,7 +21,6 @@ public class MedicoDTO {
     private String sexo;
     private String telefoneConsultorio;
     private Integer tempoConsulta;
-    private String tipo;
     private String uf;
     private BigDecimal valorConsulta;
     private LocalDate dataNascimento;
@@ -39,7 +38,6 @@ public class MedicoDTO {
         this.sexo = medico.getSexo();
         this.telefoneConsultorio = medico.getTelefoneConsultorio();
         this.tempoConsulta = medico.getTempoConsulta();
-        this.tipo = medico.getTipo();
         this.uf = medico.getUf();
         this.valorConsulta = medico.getValorConsulta();
         this.dataNascimento = medico.getDataNascimento();
