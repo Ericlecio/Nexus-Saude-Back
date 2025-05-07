@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String pacienteId;
+    private Integer id;
 
     @Column(length = 100, nullable = false)
     private String nomeCompleto;
@@ -52,7 +52,7 @@ public class Paciente {
 
     @Override
     public String toString() {
-        return "Paciente [pacienteId=" + pacienteId + ", nomeCompleto=" + nomeCompleto + ", email=" + email +
-               ", cpf=" + cpf + ", planoSaude=" + planoSaude + "]";
+        return "Paciente [pacienteId=" + id + ", nomeCompleto=" + nomeCompleto + ", email=" + email +
+                ", cpf=" + cpf + ", planoSaude=" + planoSaude + "]";
     }
 }

@@ -24,12 +24,12 @@ public class MedicoController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/inserir")
-public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
-    medico.setSenha(passwordEncoder.encode(medico.getSenha()));
-    medico.setEmail(medico.getEmail().toLowerCase());
-    Medico savedMedico = repository.save(medico);
-    return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
-}
+    public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
+        medico.setSenha(passwordEncoder.encode(medico.getSenha()));
+        medico.setEmail(medico.getEmail().toLowerCase());
+        Medico savedMedico = repository.save(medico);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
+    }
 
     @GetMapping("/listar")
     public List<MedicoDTO> getMedicos() {

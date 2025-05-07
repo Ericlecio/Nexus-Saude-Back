@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
 import ifpe.edu.br.nexus_saude.model.Paciente;
 import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/Paciente")
@@ -34,7 +36,8 @@ public class PacienteController {
     }
 
     @PutMapping("/update{pacienteId}")
-    public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable String pacienteId, @RequestBody Paciente pacienteAtualizado) {
+    public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable String pacienteId,
+            @RequestBody Paciente pacienteAtualizado) {
         return repository.findById(pacienteId)
                 .map(paciente -> {
                     paciente.setNomeCompleto(pacienteAtualizado.getNomeCompleto());

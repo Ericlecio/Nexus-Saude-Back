@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PacienteDTO {
-    private String pacienteId;
+    private Integer id;
     private String nomeCompleto;
     private String email;
     private String telefone;
@@ -23,7 +23,7 @@ public class PacienteDTO {
     private LocalDateTime updatedAt;
 
     public PacienteDTO(Paciente paciente) {
-        this.pacienteId = paciente.getPacienteId();
+        this.id = paciente.getId();
         this.nomeCompleto = paciente.getNomeCompleto();
         this.email = paciente.getEmail();
         this.telefone = paciente.getTelefone();
