@@ -36,9 +36,9 @@ public class PacienteController {
     }
 
     @PutMapping("/update{pacienteId}")
-    public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable String pacienteId,
+    public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer id,
             @RequestBody Paciente pacienteAtualizado) {
-        return repository.findById(pacienteId)
+        return repository.findById(id)
                 .map(paciente -> {
                     paciente.setNomeCompleto(pacienteAtualizado.getNomeCompleto());
                     paciente.setEmail(pacienteAtualizado.getEmail());
@@ -53,8 +53,8 @@ public class PacienteController {
     }
 
     @DeleteMapping("/deletar{pacienteId}")
-    public ResponseEntity<Object> deletePaciente(@PathVariable String pacienteId) {
-        return repository.findById(pacienteId)
+    public ResponseEntity<Object> deletePaciente(@PathVariable Integer id) {
+        return repository.findById(id)
                 .map(paciente -> {
                     repository.delete(paciente);
                     return ResponseEntity.noContent().build();
