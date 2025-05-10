@@ -17,50 +17,50 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequestMapping("/medico")
 public class MedicoController {
 
-    @Autowired
-    private MedicoRepository repository;
+	@Autowired
+	private MedicoRepository repository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/inserir")
-public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
-    medico.setSenha(passwordEncoder.encode(medico.getSenha()));
-    medico.setEmail(medico.getEmail().toLowerCase());
-    Medico savedMedico = repository.save(medico);
-    return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
-}
+	@PostMapping("/inserir")
+	public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
+		medico.setSenha(passwordEncoder.encode(medico.getSenha()));
+		medico.setEmail(medico.getEmail().toLowerCase());
+		Medico savedMedico = repository.save(medico);
+		return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
+	}
 
-    @GetMapping("/listar")
-    public List<MedicoDTO> getMedicos() {
-        return repository.findAll()
-                .stream()
-                .map(MedicoDTO::new)
-                .toList();
-    }
+	@GetMapping("/listar")
+	public List<MedicoDTO> getMedicos() {
+		return repository.findAll()
+				.stream()
+				.map(MedicoDTO::new)
+				.toList();
+	}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id, @RequestBody Medico medicoAtualizado) {
-        return repository.findById(id)
-                .map(medico -> {
-                    medico.setNome(medicoAtualizado.getNome());
-                    medico.setEmail(medicoAtualizado.getEmail());
-                    medico.setSenha(passwordEncoder.encode(medicoAtualizado.getSenha()));
-                    medico.setCrm(medicoAtualizado.getCrm());
-                    medico.setEspecialidade(medicoAtualizado.getEspecialidade());
-                    Medico updated = repository.save(medico);
-                    return ResponseEntity.ok(new MedicoDTO(updated));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id, @RequestBody Medico medicoAtualizado) {
+		return repository.findById(id)
+				.map(medico -> {
+					medico.setNome(medicoAtualizado.getNome());
+					medico.setEmail(medicoAtualizado.getEmail());
+					medico.setSenha(passwordEncoder.encode(medicoAtualizado.getSenha()));
+					medico.setCrm(medicoAtualizado.getCrm());
+					medico.setEspecialidade(medicoAtualizado.getEspecialidade());
+					Medico updated = repository.save(medico);
+					return ResponseEntity.ok(new MedicoDTO(updated));
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteMedico(@PathVariable Integer id) {
-        return repository.findById(id)
-                .map(medico -> {
-                    repository.delete(medico);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Object> deleteMedico(@PathVariable Integer id) {
+		return repository.findById(id)
+				.map(medico -> {
+					repository.delete(medico);
+					return ResponseEntity.noContent().build();
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
 }
