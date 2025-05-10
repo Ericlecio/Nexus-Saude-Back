@@ -18,14 +18,14 @@ public class PacienteController {
     @Autowired
     private PacienteRepository repository;
 
-    @PostMapping("/paciente/inserir")
+    @PostMapping("/inserir")
     public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
         paciente.setEmail(paciente.getEmail().toLowerCase());
         Paciente savedPaciente = repository.save(paciente);
         return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
     }
 
-    @GetMapping("/paciente/listar")
+    @GetMapping("/listar")
     public List<PacienteDTO> getPacientes() {
         return repository.findAll()
                 .stream()
@@ -33,7 +33,7 @@ public class PacienteController {
                 .toList();
     }
 
-    @PutMapping("/paciente/{pacienteId}")
+    @PutMapping("/{pacienteId}")
     public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId, @RequestBody Paciente pacienteAtualizado) {
         return repository.findById(pacienteId)
                 .map(paciente -> {
@@ -49,7 +49,7 @@ public class PacienteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/paciente/{pacienteId}")
+    @DeleteMapping("/{pacienteId}")
     public ResponseEntity<Object> deletePaciente(@PathVariable Integer pacienteId) {
         return repository.findById(pacienteId)
                 .map(paciente -> {
