@@ -27,7 +27,6 @@ public class AdministradorController {
 	private AdministradorRepository repository;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
 	@PostMapping("/admin")
 	public ResponseEntity<AdministradorDTO> postAdmin(@RequestBody Administrador admin) {
 		admin.setSenha(passwordEncoder.encode(admin.getSenha()));

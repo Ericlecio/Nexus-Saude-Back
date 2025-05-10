@@ -12,9 +12,9 @@ import lombok.*;
 @AllArgsConstructor
 public class ConsultaDTO {
 	private Integer id;
-    private String pacienteId;
+    private Integer pacienteId;
     private Integer medicoId;
-    private String data;
+    private LocalDateTime data;
     private String especialidade;
     private String local;
     private Integer situacaoId;
@@ -30,14 +30,16 @@ public class ConsultaDTO {
     }
 
     public Consulta toEntity(Paciente paciente, Medico medico, SituacaoAgendamento situacao) {
-        Consulta consulta = new Consulta();
-        consulta.setConsultaId(id);;
-        consulta.setPaciente(paciente);
-        consulta.setMedico(medico);
-        consulta.setData(this.data);
-        consulta.setEspecialidade(this.especialidade);
-        consulta.setLocal(this.local);
-        consulta.setSituacao(situacao);
-        return consulta;
+        return Consulta.builder()
+                .consultaId(this.id)
+                .paciente(paciente)
+                .medico(medico)
+                .data(this.data)
+                .especialidade(this.especialidade)
+                .local(this.local)
+                .situacao(situacao)
+                .build();
     }
+
+
 }

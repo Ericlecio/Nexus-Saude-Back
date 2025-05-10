@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PacienteDTO {
-    private String pacienteId;
+    private Integer pacienteId;
     private String nomeCompleto;
     private String email;
     private String telefone;

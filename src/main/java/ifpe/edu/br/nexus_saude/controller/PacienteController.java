@@ -12,7 +12,7 @@ import ifpe.edu.br.nexus_saude.model.Paciente;
 import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/Paciente")
+@RequestMapping("/paciente")
 public class PacienteController {
 
     @Autowired
@@ -34,7 +34,7 @@ public class PacienteController {
     }
 
     @PutMapping("/paciente/{pacienteId}")
-    public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable String pacienteId, @RequestBody Paciente pacienteAtualizado) {
+    public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId, @RequestBody Paciente pacienteAtualizado) {
         return repository.findById(pacienteId)
                 .map(paciente -> {
                     paciente.setNomeCompleto(pacienteAtualizado.getNomeCompleto());
@@ -50,7 +50,7 @@ public class PacienteController {
     }
 
     @DeleteMapping("/paciente/{pacienteId}")
-    public ResponseEntity<Object> deletePaciente(@PathVariable String pacienteId) {
+    public ResponseEntity<Object> deletePaciente(@PathVariable Integer pacienteId) {
         return repository.findById(pacienteId)
                 .map(paciente -> {
                     repository.delete(paciente);
