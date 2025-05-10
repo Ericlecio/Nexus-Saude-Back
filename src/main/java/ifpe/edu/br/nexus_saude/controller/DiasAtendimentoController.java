@@ -121,9 +121,9 @@ public class DiasAtendimentoController {
 		return diasAtendimentoRepository.findById(id)
 				.map(dia -> {
 					diasAtendimentoRepository.delete(dia);
-					return ResponseEntity.ok("Dias de atendimento deletado com sucesso!");
+					return ResponseEntity.ok("Registro de Atendimento deletado com sucesso!");
 				})
-				.orElseGet(() -> ResponseEntity.status(404).body("Dias de atendimento não encontrado"));
+				.orElseGet(() -> ResponseEntity.status(404).body("Registro de Atendimento deletado"));
 	}
 
 }
