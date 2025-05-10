@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Consulta {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +37,7 @@ public class Consulta {
 	private Medico medico;
 
 	@Column(nullable = false)
-	private String data;
+	private LocalDateTime data;
 
 	@Column(nullable = false)
 	private String especialidade;
@@ -47,8 +49,10 @@ public class Consulta {
 	private SituacaoAgendamento situacao;
 
 	@Column(nullable = false)
-	private String createdAt;
+	private LocalDateTime createdAt;
 
 	@Column(nullable = false)
-	private String updatedAt;
+	private LocalDateTime updatedAt;
+
+
 }
