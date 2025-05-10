@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "id") // Altere para o nome correto da coluna no banco de dados
+    private Integer pacienteId;
 
     @Column(length = 100, nullable = false)
     private String nomeCompleto;
@@ -52,7 +53,7 @@ public class Paciente {
 
     @Override
     public String toString() {
-        return "Paciente [pacienteId=" + id + ", nomeCompleto=" + nomeCompleto + ", email=" + email +
+        return "Paciente [pacienteId=" + pacienteId + ", nomeCompleto=" + nomeCompleto + ", email=" + email +
                 ", cpf=" + cpf + ", planoSaude=" + planoSaude + "]";
     }
 }

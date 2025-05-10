@@ -35,7 +35,7 @@ public class Consulta {
 	private Medico medico;
 
 	@Column(nullable = false)
-	private String data;
+	private LocalDateTime data; // Alterado de String para LocalDateTime
 
 	@Column(nullable = false)
 	private String especialidade;

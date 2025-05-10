@@ -1,11 +1,12 @@
 package ifpe.edu.br.nexus_saude.dto;
 
+import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,6 +29,8 @@ public class MedicoDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private List<DiasAtendimento> diasAtendimento; // Adicionado o campo para dias de atendimento
+
     public MedicoDTO(Medico medico) {
         this.id = medico.getId();
         this.nome = medico.getNome();
@@ -44,5 +47,6 @@ public class MedicoDTO {
         this.dataCadastro = medico.getDataCadastro();
         this.createdAt = medico.getCreatedAt();
         this.updatedAt = medico.getUpdatedAt();
+
     }
 }
