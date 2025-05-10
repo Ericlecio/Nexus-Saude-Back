@@ -12,7 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class DiasAtendimentoDTO {
 	private Integer diasAtendimentoId;
     private String nomeMedico; // Assuming Medico has a 'nome' field
