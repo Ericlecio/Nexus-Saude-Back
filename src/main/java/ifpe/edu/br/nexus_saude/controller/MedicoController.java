@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/Medico")
+@RequestMapping("/medico")
 public class MedicoController {
 
     @Autowired
@@ -23,7 +23,7 @@ public class MedicoController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/medico/inserir")
+    @PostMapping("/inserir")
 public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
     medico.setSenha(passwordEncoder.encode(medico.getSenha()));
     medico.setEmail(medico.getEmail().toLowerCase());
@@ -31,7 +31,7 @@ public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
     return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
 }
 
-    @GetMapping("/medico/listar")
+    @GetMapping("/listar")
     public List<MedicoDTO> getMedicos() {
         return repository.findAll()
                 .stream()
@@ -39,7 +39,7 @@ public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
                 .toList();
     }
 
-    @PutMapping("/medico/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id, @RequestBody Medico medicoAtualizado) {
         return repository.findById(id)
                 .map(medico -> {
@@ -54,7 +54,7 @@ public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/medico/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteMedico(@PathVariable Integer id) {
         return repository.findById(id)
                 .map(medico -> {
