@@ -1,4 +1,6 @@
 package ifpe.edu.br.nexus_saude.dto;
+import java.time.LocalDateTime;
+
 import ifpe.edu.br.nexus_saude.model.Consulta;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import ifpe.edu.br.nexus_saude.model.Paciente;
@@ -10,16 +12,16 @@ import lombok.*;
 @AllArgsConstructor
 public class ConsultaDTO {
 	private Integer id;
-    private Integer pacienteId;
+    private String pacienteId;
     private Integer medicoId;
-    private LocalDateTime data;
+    private String data;
     private String especialidade;
     private String local;
     private Integer situacaoId;
 
     public ConsultaDTO(Consulta consulta) {
-        this.id = consulta.getId();
-        this.pacienteId = consulta.getPaciente().getId();
+        this.id = consulta.getConsultaId();
+        this.pacienteId = consulta.getPaciente().getPacienteId();
         this.medicoId = consulta.getMedico().getId();
         this.data = consulta.getData();
         this.especialidade = consulta.getEspecialidade();
@@ -29,7 +31,7 @@ public class ConsultaDTO {
 
     public Consulta toEntity(Paciente paciente, Medico medico, SituacaoAgendamento situacao) {
         Consulta consulta = new Consulta();
-        consulta.setId(this.id);
+        consulta.setConsultaId(id);;
         consulta.setPaciente(paciente);
         consulta.setMedico(medico);
         consulta.setData(this.data);
