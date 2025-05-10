@@ -38,6 +38,8 @@ public class ConsultaDTO {
                 .especialidade(this.especialidade)
                 .local(this.local)
                 .situacao(situacao)
+                .createdAt(LocalDateTime.now()) // 🔹 Automatically set createdAt
+                .updatedAt(LocalDateTime.now()) // 🔹 Set updatedAt too
                 .build();
     }
 
