@@ -3,13 +3,15 @@ package ifpe.edu.br.nexus_saude.controller;
 import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
 import ifpe.edu.br.nexus_saude.model.Paciente;
 import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Importando o BCryptPasswordEncoder
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -18,6 +20,9 @@ public class PacienteController {
 
     @Autowired
     private PacienteRepository repository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder; // Injeção do BCryptPasswordEncoder
 
     // Método para listar todos os pacientes
     @GetMapping("/listar")
@@ -31,7 +36,7 @@ public class PacienteController {
     // Método para obter os dados de um paciente específico por ID
     @GetMapping("/{pacienteId}")
     public ResponseEntity<PacienteDTO> getPaciente(@PathVariable Integer pacienteId) {
-        Optional<Paciente> paciente = repository.findById(pacienteId);
+        Optional<Paciente> paciente = repository.findById(pacienteId); // Certifique-se de usar Optional<Paciente>
         return paciente.map(p -> ResponseEntity.ok(new PacienteDTO(p)))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -69,7 +74,61 @@ public class PacienteController {
     @PostMapping("/inserir")
     public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
         paciente.setEmail(paciente.getEmail().toLowerCase());
+
+        // Criptografando a senha ao criar o paciente
+        if (paciente.getSenha() != null) {
+            paciente.setSenha(passwordEncoder.encode(paciente.getSenha()));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Retorna erro se a senha não for
+                                                                             // fornecida
+        }
+
         Paciente savedPaciente = repository.save(paciente);
         return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
+    }
+
+    // Método para redefinir a senha do paciente
+    @PutMapping("/redefinir-senha/{pacienteId}")
+    public ResponseEntity<String> redefinirSenha(@PathVariable Integer pacienteId,
+            @RequestBody RedefinirSenhaRequest request) {
+        Paciente paciente = repository.findById(pacienteId).orElse(null);
+        if (paciente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente não encontrado.");
+        }
+
+        // Verificando se a senha antiga é válida
+        boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(), paciente.getSenha());
+        if (!senhaValida) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha antiga incorreta.");
+        }
+
+        // Criptografando a nova senha e atualizando o paciente
+        String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
+        paciente.setSenha(novaSenhaCriptografada);
+        repository.save(paciente);
+
+        return ResponseEntity.ok("Senha alterada com sucesso.");
+    }
+
+    // Classe para receber a senha antiga e nova no request
+    public static class RedefinirSenhaRequest {
+        private String senhaAntiga;
+        private String novaSenha;
+
+        public String getSenhaAntiga() {
+            return senhaAntiga;
+        }
+
+        public void setSenhaAntiga(String senhaAntiga) {
+            this.senhaAntiga = senhaAntiga;
+        }
+
+        public String getNovaSenha() {
+            return novaSenha;
+        }
+
+        public void setNovaSenha(String novaSenha) {
+            this.novaSenha = novaSenha;
+        }
     }
 }

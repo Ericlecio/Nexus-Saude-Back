@@ -34,6 +34,9 @@ public class Paciente {
     @Column(length = 50)
     private String planoSaude;
 
+    @Column(length = 255, nullable = false)
+    private String senha; // A senha será armazenada criptografada
+
     private LocalDateTime dataCadastro;
 
     private LocalDateTime createdAt;
