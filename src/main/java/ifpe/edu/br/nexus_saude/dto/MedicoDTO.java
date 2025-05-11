@@ -1,11 +1,12 @@
 package ifpe.edu.br.nexus_saude.dto;
 
+import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,13 +22,14 @@ public class MedicoDTO {
     private String sexo;
     private String telefoneConsultorio;
     private Integer tempoConsulta;
-    private String tipo;
     private String uf;
     private BigDecimal valorConsulta;
     private LocalDate dataNascimento;
     private LocalDateTime dataCadastro;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private List<DiasAtendimento> diasAtendimento; // Adicionado o campo para dias de atendimento
 
     public MedicoDTO(Medico medico) {
         this.id = medico.getId();
@@ -39,12 +41,12 @@ public class MedicoDTO {
         this.sexo = medico.getSexo();
         this.telefoneConsultorio = medico.getTelefoneConsultorio();
         this.tempoConsulta = medico.getTempoConsulta();
-        this.tipo = medico.getTipo();
         this.uf = medico.getUf();
         this.valorConsulta = medico.getValorConsulta();
         this.dataNascimento = medico.getDataNascimento();
         this.dataCadastro = medico.getDataCadastro();
         this.createdAt = medico.getCreatedAt();
         this.updatedAt = medico.getUpdatedAt();
+
     }
 }

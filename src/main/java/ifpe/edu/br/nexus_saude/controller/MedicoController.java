@@ -1,28 +1,27 @@
 package ifpe.edu.br.nexus_saude.controller;
 
-import java.util.List;
-
+import ifpe.edu.br.nexus_saude.dto.MedicoDTO;
+import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
+import ifpe.edu.br.nexus_saude.model.Medico;
+import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
+import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import ifpe.edu.br.nexus_saude.dto.MedicoDTO;
-import ifpe.edu.br.nexus_saude.model.Medico;
-import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/medico")
 public class MedicoController {
-
 	@Autowired
 	private MedicoRepository repository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
 	@PostMapping("/inserir")
 	public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
 		medico.setSenha(passwordEncoder.encode(medico.getSenha()));
@@ -63,4 +62,5 @@ public class MedicoController {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
+
 }

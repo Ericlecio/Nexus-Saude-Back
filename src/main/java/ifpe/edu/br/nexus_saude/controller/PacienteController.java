@@ -1,15 +1,16 @@
 package ifpe.edu.br.nexus_saude.controller;
 
-import java.util.List;
-
+import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
+import ifpe.edu.br.nexus_saude.model.Paciente;
+import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
-import ifpe.edu.br.nexus_saude.model.Paciente;
-import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
+import java.util.List;
+import java.util.Optional;
+
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/paciente")
@@ -17,7 +18,6 @@ public class PacienteController {
 
     @Autowired
     private PacienteRepository repository;
-
     @PostMapping("/inserir")
     public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
         paciente.setEmail(paciente.getEmail().toLowerCase());
@@ -32,9 +32,9 @@ public class PacienteController {
                 .map(PacienteDTO::new)
                 .toList();
     }
-
     @PutMapping("/{pacienteId}")
     public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId, @RequestBody Paciente pacienteAtualizado) {
+
         return repository.findById(pacienteId)
                 .map(paciente -> {
                     paciente.setNomeCompleto(pacienteAtualizado.getNomeCompleto());
@@ -48,7 +48,6 @@ public class PacienteController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-
     @DeleteMapping("/{pacienteId}")
     public ResponseEntity<Object> deletePaciente(@PathVariable Integer pacienteId) {
         return repository.findById(pacienteId)
@@ -57,5 +56,13 @@ public class PacienteController {
                     return ResponseEntity.noContent().build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Método para inserir um novo paciente
+    @PostMapping("/inserir")
+    public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
+        paciente.setEmail(paciente.getEmail().toLowerCase());
+        Paciente savedPaciente = repository.save(paciente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
     }
 }

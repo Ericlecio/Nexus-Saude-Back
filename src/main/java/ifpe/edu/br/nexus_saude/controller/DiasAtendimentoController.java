@@ -1,4 +1,4 @@
-package ifpe.edu.br.nexus_saude.controller;
+package ifpe.edu.br.nexus_saude.controll
 import ifpe.edu.br.nexus_saude.dto.DiasAtendimentoDTO;
 import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
@@ -125,5 +125,6 @@ public class DiasAtendimentoController {
 				})
 				.orElseGet(() -> ResponseEntity.status(404).body("Registro de Atendimento deletado"));
 	}
+
 
 }

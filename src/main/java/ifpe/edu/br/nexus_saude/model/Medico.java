@@ -5,6 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "medico")
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Medico {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -41,10 +43,7 @@ public class Medico {
     @Column(length = 20)
     private String telefoneConsultorio;
 
-    private Integer tempoConsulta; // minutos
-
-    @Column(length = 20)
-    private String tipo;
+    private Integer tempoConsulta;
 
     @Column(length = 2)
     private String uf;
@@ -60,6 +59,10 @@ public class Medico {
 
     private LocalDateTime updatedAt;
 
+    // Relacionamento com a entidade DiasAtendimento
+    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<DiasAtendimento> diasAtendimento;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -74,6 +77,6 @@ public class Medico {
     @Override
     public String toString() {
         return "Medico [id=" + id + ", nome=" + nome + ", email=" + email +
-               ", crm=" + crm + ", especialidade=" + especialidade + "]";
+                ", crm=" + crm + ", especialidade=" + especialidade + "]";
     }
 }

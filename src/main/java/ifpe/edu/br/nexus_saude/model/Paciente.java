@@ -17,7 +17,6 @@ public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer pacienteId;
-
     @Column(length = 100, nullable = false)
     private String nomeCompleto;
 
@@ -55,6 +54,6 @@ public class Paciente {
     @Override
     public String toString() {
         return "Paciente [pacienteId=" + pacienteId + ", nomeCompleto=" + nomeCompleto + ", email=" + email +
-               ", cpf=" + cpf + ", planoSaude=" + planoSaude + "]";
+                ", cpf=" + cpf + ", planoSaude=" + planoSaude + "]";
     }
 }

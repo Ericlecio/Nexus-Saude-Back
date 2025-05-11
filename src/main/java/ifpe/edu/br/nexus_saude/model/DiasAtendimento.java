@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -19,19 +20,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiasAtendimento {
-	@Id
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dias_atendimento_id")
     private Integer diasAtendimentoId;
 
     @ManyToOne
+    @JoinColumn(name = "medico_id", nullable = false) // Relacionando com a tabela de médico
     private Medico medico;
 
     @Column(nullable = false, length = 20)
-    private String diaSemana;
+    private String diaSemana; // Dia da semana
 
     @Column(nullable = false)
-    private String horario;
+    private String horario; // Horário de atendimento
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
