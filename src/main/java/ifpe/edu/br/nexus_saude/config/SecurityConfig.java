@@ -9,22 +9,22 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
-	
+
 	@Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-	
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-			.authorizeHttpRequests(auth -> auth
-				.anyRequest().permitAll()  // Permite todas as requisições
-			)
-			.csrf(csrf -> csrf.disable())  // Desativa CSRF
-			.httpBasic(httpBasic -> {});  // Permite autenticação básica
-	
+				.authorizeHttpRequests(auth -> auth
+						.anyRequest().permitAll())
+				.csrf(csrf -> csrf.disable())
+				.httpBasic(httpBasic -> {
+				});
+
 		return http.build();
 	}
-	 
-	 }
+
+}
