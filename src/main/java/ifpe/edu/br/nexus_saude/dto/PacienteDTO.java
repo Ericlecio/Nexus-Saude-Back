@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class PacienteDTO {
-    private Integer id;
+    private Integer pacienteId;
     private String nomeCompleto;
     private String email;
     private String telefone;

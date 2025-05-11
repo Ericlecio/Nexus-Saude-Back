@@ -15,75 +15,52 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/Medico")
+@RequestMapping("/medico")
 public class MedicoController {
+	@Autowired
+	private MedicoRepository repository;
 
-    @Autowired
-    private MedicoRepository medicoRepository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	@PostMapping("/inserir")
+	public ResponseEntity<MedicoDTO> postMedico(@RequestBody Medico medico) {
+		medico.setSenha(passwordEncoder.encode(medico.getSenha()));
+		medico.setEmail(medico.getEmail().toLowerCase());
+		Medico savedMedico = repository.save(medico);
+		return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
+	}
 
-    @Autowired
-    private DiasAtendimentoRepository diasAtendimentoRepository;
+	@GetMapping("/listar")
+	public List<MedicoDTO> getMedicos() {
+		return repository.findAll()
+				.stream()
+				.map(MedicoDTO::new)
+				.toList();
+	}
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@PutMapping("/{id}")
+	public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id, @RequestBody Medico medicoAtualizado) {
+		return repository.findById(id)
+				.map(medico -> {
+					medico.setNome(medicoAtualizado.getNome());
+					medico.setEmail(medicoAtualizado.getEmail());
+					medico.setSenha(passwordEncoder.encode(medicoAtualizado.getSenha()));
+					medico.setCrm(medicoAtualizado.getCrm());
+					medico.setEspecialidade(medicoAtualizado.getEspecialidade());
+					Medico updated = repository.save(medico);
+					return ResponseEntity.ok(new MedicoDTO(updated));
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
 
-    // Método para cadastrar o médico e os dias de atendimento
-    @PostMapping("/inserir")
-    public ResponseEntity<Medico> postMedico(@RequestBody Medico medico) {
-        // Criação do médico
-        medico.setSenha(passwordEncoder.encode(medico.getSenha()));
-        medico.setEmail(medico.getEmail().toLowerCase());
-        Medico savedMedico = medicoRepository.save(medico);
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Object> deleteMedico(@PathVariable Integer id) {
+		return repository.findById(id)
+				.map(medico -> {
+					repository.delete(medico);
+					return ResponseEntity.noContent().build();
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
 
-        // Associando e salvando os dias de atendimento
-        if (medico.getDiasAtendimento() != null && !medico.getDiasAtendimento().isEmpty()) {
-            for (DiasAtendimento diaAtendimento : medico.getDiasAtendimento()) {
-                diaAtendimento.setMedico(savedMedico); // Associando o médico
-                diasAtendimentoRepository.save(diaAtendimento); // Salvando os dias de atendimento
-            }
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMedico);
-    }
-
-    // Método para listar todos os médicos
-    @GetMapping("/listar")
-    public List<Medico> getMedicos() {
-        return medicoRepository.findAll();
-    }
-
-    // Método para buscar o médico pelo ID
-    @GetMapping("/{id}")
-    public ResponseEntity<MedicoDTO> getMedicoById(@PathVariable Integer id) {
-        return medicoRepository.findById(id)
-                .map(medico -> ResponseEntity.ok(new MedicoDTO(medico))) // Retorna o DTO do médico
-                .orElse(ResponseEntity.notFound().build()); // Retorna 404 se não encontrar
-    }
-
-    // Método para atualizar o médico
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Medico> updateMedico(@PathVariable Integer id, @RequestBody Medico medicoAtualizado) {
-        return medicoRepository.findById(id)
-                .map(medico -> {
-                    medico.setNome(medicoAtualizado.getNome());
-                    medico.setEmail(medicoAtualizado.getEmail());
-                    medico.setSenha(passwordEncoder.encode(medicoAtualizado.getSenha()));
-                    medico.setCrm(medicoAtualizado.getCrm());
-                    medico.setEspecialidade(medicoAtualizado.getEspecialidade());
-                    Medico updated = medicoRepository.save(medico);
-                    return ResponseEntity.ok(updated);
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // Método para deletar o médico
-    @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<Object> deleteMedico(@PathVariable Integer id) {
-        return medicoRepository.findById(id)
-                .map(medico -> {
-                    medicoRepository.delete(medico);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
 }

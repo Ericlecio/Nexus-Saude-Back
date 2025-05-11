@@ -13,10 +13,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConsultaDTO {
-    private Integer id; // ID da consulta
-    private Integer pacienteId; // Alterado de String para Integer
-    private Integer medicoId; // ID do médico
-    private String data; // Data como String, mas pode ser LocalDateTime se necessário
+	private Integer id;
+    private Integer pacienteId;
+    private Integer medicoId;
+    private LocalDateTime data;
     private String especialidade;
     private String local;
     private Integer situacaoId; // ID da situação do agendamento
@@ -33,15 +33,17 @@ public class ConsultaDTO {
     }
 
     public Consulta toEntity(Paciente paciente, Medico medico, SituacaoAgendamento situacao) {
-        Consulta consulta = new Consulta();
-        consulta.setConsultaId(id);
-        consulta.setPaciente(paciente);
-        consulta.setMedico(medico);
-        consulta.setData(LocalDateTime.parse(this.data)); // Converte 'data' de String para LocalDateTime
-        consulta.setEspecialidade(this.especialidade);
-        consulta.setLocal(this.local);
-        consulta.setSituacao(situacao);
-        return consulta;
+        return Consulta.builder()
+                .consultaId(this.id)
+                .paciente(paciente)
+                .medico(medico)
+                .data(this.data)
+                .especialidade(this.especialidade)
+                .local(this.local)
+                .situacao(situacao)
+                .createdAt(LocalDateTime.now()) // 🔹 Automatically set createdAt
+                .updatedAt(LocalDateTime.now()) // 🔹 Set updatedAt too
+                .build();
     }
 
 }

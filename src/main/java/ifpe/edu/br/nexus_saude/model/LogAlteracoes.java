@@ -1,5 +1,7 @@
 package ifpe.edu.br.nexus_saude.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,7 +33,7 @@ public class LogAlteracoes {
     private String usuarioResponsavel;
 
     @Column(nullable = false)
-    private String dataAlteracao;
+    private LocalDateTime dataAlteracao;
 
     @Column(nullable = false)
     private String alteracao;

@@ -19,7 +19,8 @@ public class AgendamentoDTO {
     private String especialidade;
     private String local;
     private Integer medicoId;
-    private Integer pacienteId; // Alterado de String para Integer
+    private Integer pacienteId;
+
     private Integer situacaoId;
     private String telefoneConsultorio;
     private BigDecimal valorConsulta;

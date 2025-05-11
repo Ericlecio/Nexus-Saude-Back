@@ -1,5 +1,7 @@
 package ifpe.edu.br.nexus_saude.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,13 +37,8 @@ public class DiasAtendimento {
     private String horario; // Horário de atendimento
 
     @Column(nullable = false)
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private String updatedAt;
-
-    // Método setMedico
-    public void setMedico(Medico medico) {
-        this.medico = medico;
-    }
+    private LocalDateTime updatedAt;
 }
