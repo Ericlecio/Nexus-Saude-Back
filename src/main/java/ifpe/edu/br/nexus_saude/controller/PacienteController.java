@@ -13,18 +13,13 @@ import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/paciente")
+@RequestMapping("/Paciente")
 public class PacienteController {
 
     @Autowired
     private PacienteRepository repository;
-    @PostMapping("/inserir")
-    public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
-        paciente.setEmail(paciente.getEmail().toLowerCase());
-        Paciente savedPaciente = repository.save(paciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
-    }
 
+    // Método para listar todos os pacientes
     @GetMapping("/listar")
     public List<PacienteDTO> getPacientes() {
         return repository.findAll()
@@ -32,9 +27,19 @@ public class PacienteController {
                 .map(PacienteDTO::new)
                 .toList();
     }
-    @PutMapping("/{pacienteId}")
-    public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId, @RequestBody Paciente pacienteAtualizado) {
 
+    // Método para obter os dados de um paciente específico por ID
+    @GetMapping("/{pacienteId}")
+    public ResponseEntity<PacienteDTO> getPaciente(@PathVariable Integer pacienteId) {
+        Optional<Paciente> paciente = repository.findById(pacienteId);
+        return paciente.map(p -> ResponseEntity.ok(new PacienteDTO(p)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Método para atualizar os dados do paciente
+    @PutMapping("/update/{pacienteId}")
+    public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId,
+            @RequestBody Paciente pacienteAtualizado) {
         return repository.findById(pacienteId)
                 .map(paciente -> {
                     paciente.setNomeCompleto(pacienteAtualizado.getNomeCompleto());
@@ -48,7 +53,9 @@ public class PacienteController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-    @DeleteMapping("/{pacienteId}")
+
+    // Método para deletar um paciente
+    @DeleteMapping("/deletar/{pacienteId}")
     public ResponseEntity<Object> deletePaciente(@PathVariable Integer pacienteId) {
         return repository.findById(pacienteId)
                 .map(paciente -> {
@@ -58,5 +65,11 @@ public class PacienteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    
+    // Método para inserir um novo paciente
+    @PostMapping("/inserir")
+    public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
+        paciente.setEmail(paciente.getEmail().toLowerCase());
+        Paciente savedPaciente = repository.save(paciente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
+    }
 }

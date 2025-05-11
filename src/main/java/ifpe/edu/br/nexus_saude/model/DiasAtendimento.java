@@ -1,18 +1,11 @@
 package ifpe.edu.br.nexus_saude.model;
 
-import java.time.LocalDateTime;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "dias_atendimento")
@@ -27,14 +20,14 @@ public class DiasAtendimento {
     private Integer diasAtendimentoId;
 
     @ManyToOne
-    @JoinColumn(name = "medico_id", nullable = false) // Relacionando com a tabela de médico
+    @JoinColumn(name = "medico_id", nullable = false)
     private Medico medico;
 
     @Column(nullable = false, length = 20)
-    private String diaSemana; // Dia da semana
+    private String diaSemana;
 
     @Column(nullable = false)
-    private String horario; // Horário de atendimento
+    private String horario;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

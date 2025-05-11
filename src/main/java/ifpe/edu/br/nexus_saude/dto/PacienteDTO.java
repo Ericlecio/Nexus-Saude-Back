@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class PacienteDTO {
-    private Integer pacienteId;
+    private Integer id;
     private String nomeCompleto;
     private String email;
     private String telefone;
@@ -22,7 +22,7 @@ public class PacienteDTO {
 
     // Construtor que recebe um Paciente e mapeia os campos
     public PacienteDTO(Paciente paciente) {
-        this.pacienteId = paciente.getPacienteId(); // Alterado de getId() para getPacienteId()
+        this.id = paciente.getPacienteId(); // Alterado de getId() para getPacienteId()
         this.nomeCompleto = paciente.getNomeCompleto();
         this.email = paciente.getEmail();
         this.telefone = paciente.getTelefone();
