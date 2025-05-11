@@ -1,4 +1,4 @@
-package ifpe.edu.br.nexus_saude.controll
+package ifpe.edu.br.nexus_saude.controller;
 import ifpe.edu.br.nexus_saude.dto.DiasAtendimentoDTO;
 import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;

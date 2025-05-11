@@ -26,7 +26,7 @@ public class ConsultaDTO {
         this.id = consulta.getConsultaId();
         this.pacienteId = consulta.getPaciente().getPacienteId(); // PacienteID agora é Integer
         this.medicoId = consulta.getMedico().getId(); // MedicoID agora é Integer
-        this.data = consulta.getData().toString(); // Se 'data' no modelo for LocalDateTime, converta para String
+        this.data = consulta.getData(); // Se 'data' no modelo for LocalDateTime, converta para String
         this.especialidade = consulta.getEspecialidade();
         this.local = consulta.getLocal();
         this.situacaoId = consulta.getSituacao().getSituacaoId();

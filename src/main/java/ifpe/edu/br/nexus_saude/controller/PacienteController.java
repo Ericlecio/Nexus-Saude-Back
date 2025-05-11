@@ -58,11 +58,5 @@ public class PacienteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Método para inserir um novo paciente
-    @PostMapping("/inserir")
-    public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
-        paciente.setEmail(paciente.getEmail().toLowerCase());
-        Paciente savedPaciente = repository.save(paciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
-    }
+    
 }
