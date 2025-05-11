@@ -1,8 +1,9 @@
 package ifpe.edu.br.nexus_saude.controller;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,11 +39,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/admin")
+@CrossOrigin(origins = "http://localhost:5173")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdministradorController {
@@ -117,6 +120,17 @@ public class AdministradorController {
 	@GetMapping("/dias-atendimento")
 	public List<DiasAtendimentoDTO> listarDiasAtendimento() {
 		return diasAtendimentoRepository.findAll().stream().map(DiasAtendimentoDTO::new).toList();
+	}
+	
+	@GetMapping("/dashboard-stats")
+	public Map<String, Integer> getDashboardStats() {
+	    Map<String, Integer> stats = new HashMap<>();
+	    stats.put("doctorsCount", medicoRepository.findAll().size());
+	    stats.put("patientsCount", pacienteRepository.findAll().size());
+	    stats.put("agendamentosAtivos", agendamentoRepository.findAll().size());
+	    stats.put("consultasRealizadas", consultaHistoricoRepository.findAll().size());
+
+	    return stats;
 	}
 	// métodos do tipo PUT / PATCH para que o administrador atualize qualquer entidade
 	// 🔹 Atualizar um Médico
