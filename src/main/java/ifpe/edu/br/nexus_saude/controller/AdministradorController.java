@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdministradorController {
@@ -60,7 +60,7 @@ public class AdministradorController {
 		Administrador savedAdmin = repository.save(admin);
 		return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(savedAdmin));
 	}
-	@GetMapping("/admin/listar")
+	@GetMapping("/listar")
 	public List<AdministradorDTO> getAdmins(){
 		return repository.findAll()
 				.stream()
@@ -69,7 +69,7 @@ public class AdministradorController {
 	}
 
 	//Atualizar um administrador
-	@PutMapping("/admin/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id, @RequestBody Administrador adminDetails) {
 		return repository.findById(id)
 				.map(admin -> {
@@ -84,7 +84,7 @@ public class AdministradorController {
 	}
 
 	//Deletar um administrador
-	@DeleteMapping("/admin/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteAdmin(@PathVariable Integer id) {
 		return repository.findById(id)
 				.map(admin -> {

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 @RestController
-@RequestMapping("/api/dias-atendimento")
+@RequestMapping("/dias-atendimento")
 @CrossOrigin(origins = "http://localhost:5173")
 public class DiasAtendimentoController {
 	private final DiasAtendimentoRepository diasAtendimentoRepository;

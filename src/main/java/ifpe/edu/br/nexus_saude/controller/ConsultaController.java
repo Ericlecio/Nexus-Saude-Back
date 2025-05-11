@@ -19,7 +19,7 @@ import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
 import ifpe.edu.br.nexus_saude.repository.SituacaoAgendamentoRepository;
 
 @RestController
-@RequestMapping("/api/consultas")
+@RequestMapping("/consultas")
 public class ConsultaController {
 	private final ConsultaRepository consultaRepository;
     private final MedicoRepository medicoRepository;

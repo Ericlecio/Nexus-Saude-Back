@@ -18,7 +18,7 @@ import ifpe.edu.br.nexus_saude.model.SituacaoAgendamento;
 import ifpe.edu.br.nexus_saude.repository.SituacaoAgendamentoRepository;
 
 @RestController
-@RequestMapping("/api/situacoes")
+@RequestMapping("/situacoes")
 public class SituacaoAgendamentoController {
 	@Autowired
     private SituacaoAgendamentoRepository situacaoRepository;

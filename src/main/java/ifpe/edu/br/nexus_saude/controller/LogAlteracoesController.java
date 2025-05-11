@@ -13,7 +13,7 @@ import ifpe.edu.br.nexus_saude.model.LogAlteracoes;
 import ifpe.edu.br.nexus_saude.repository.LogAlteracoesRepository;
 
 @RestController
-@RequestMapping("/api/logs")
+@RequestMapping("/logs")
 public class LogAlteracoesController {
 	private final LogAlteracoesRepository logAlteracoesRepository;
 
