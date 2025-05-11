@@ -87,34 +87,35 @@ public class AgendamentoController {
 
 	// 🔹 PUT: Update an existing Agendamento
 	@PutMapping("/{id}")
-	public ResponseEntity<AgendamentoDTO> atualizarAgendamento(@PathVariable Integer id, @RequestBody AgendamentoDTO dto) {
-	    Optional<Agendamento> optionalAgendamento = agendamentoRepository.findById(id);
+	public ResponseEntity<AgendamentoDTO> atualizarAgendamento(@PathVariable Integer id,
+			@RequestBody AgendamentoDTO dto) {
+		Optional<Agendamento> optionalAgendamento = agendamentoRepository.findById(id);
 
-	    if (optionalAgendamento.isEmpty()) {
-	        return ResponseEntity.notFound().build(); // 🔹 Handle 404 outside `.map()`
-	    }
+		if (optionalAgendamento.isEmpty()) {
+			return ResponseEntity.notFound().build(); // 🔹 Handle 404 outside `.map()`
+		}
 
-	    Agendamento agendamento = optionalAgendamento.get();
-	    Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
-	    Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId());
-	    Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(dto.getSituacaoId());
+		Agendamento agendamento = optionalAgendamento.get();
+		Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
+		Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId());
+		Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(dto.getSituacaoId());
 
-	    if (paciente.isEmpty() || medico.isEmpty() || situacao.isEmpty()) {
-	        return ResponseEntity.badRequest().build(); // 🔹 Handle bad request outside `.map()`
-	    }
+		if (paciente.isEmpty() || medico.isEmpty() || situacao.isEmpty()) {
+			return ResponseEntity.badRequest().build(); // 🔹 Handle bad request outside `.map()`
+		}
 
-	    agendamento.setData(dto.getData());
-	    agendamento.setEspecialidade(dto.getEspecialidade());
-	    agendamento.setLocal(dto.getLocal());
-	    agendamento.setMedico(medico.get());
-	    agendamento.setPaciente(paciente.get());
-	    agendamento.setSituacao(situacao.get());
-	    agendamento.setTelefoneConsultorio(dto.getTelefoneConsultorio());
-	    agendamento.setValorConsulta(dto.getValorConsulta());
-	    agendamento.setUpdatedAt(LocalDateTime.now());
+		agendamento.setData(dto.getData());
+		agendamento.setEspecialidade(dto.getEspecialidade());
+		agendamento.setLocal(dto.getLocal());
+		agendamento.setMedico(medico.get());
+		agendamento.setPaciente(paciente.get());
+		agendamento.setSituacao(situacao.get());
+		agendamento.setTelefoneConsultorio(dto.getTelefoneConsultorio());
+		agendamento.setValorConsulta(dto.getValorConsulta());
+		agendamento.setUpdatedAt(LocalDateTime.now());
 
-	    Agendamento updatedAgendamento = agendamentoRepository.save(agendamento);
-	    return ResponseEntity.ok(new AgendamentoDTO(updatedAgendamento)); // ✅ Proper return type!
+		Agendamento updatedAgendamento = agendamentoRepository.save(agendamento);
+		return ResponseEntity.ok(new AgendamentoDTO(updatedAgendamento)); // ✅ Proper return type!
 	}
 
 	// 🔹 DELETE: Remove an Agendamento
