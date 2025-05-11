@@ -15,7 +15,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/Medico")
+@RequestMapping("/medico")
 public class MedicoController {
 
     @Autowired
@@ -38,8 +38,8 @@ public class MedicoController {
         // Associando e salvando os dias de atendimento
         if (medico.getDiasAtendimento() != null && !medico.getDiasAtendimento().isEmpty()) {
             for (DiasAtendimento diaAtendimento : medico.getDiasAtendimento()) {
-                diaAtendimento.setMedico(savedMedico); // Associando o médico
-                diasAtendimentoRepository.save(diaAtendimento); // Salvando os dias de atendimento
+                diaAtendimento.setMedico(savedMedico); 
+                diasAtendimentoRepository.save(diaAtendimento); 
             }
         }
 
@@ -56,8 +56,8 @@ public class MedicoController {
     @GetMapping("/{id}")
     public ResponseEntity<MedicoDTO> getMedicoById(@PathVariable Integer id) {
         return medicoRepository.findById(id)
-                .map(medico -> ResponseEntity.ok(new MedicoDTO(medico))) // Retorna o DTO do médico
-                .orElse(ResponseEntity.notFound().build()); // Retorna 404 se não encontrar
+                .map(medico -> ResponseEntity.ok(new MedicoDTO(medico))) 
+                .orElse(ResponseEntity.notFound().build()); 
     }
 
     // Método para atualizar o médico

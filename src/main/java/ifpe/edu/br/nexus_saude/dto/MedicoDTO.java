@@ -29,7 +29,7 @@ public class MedicoDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private List<DiasAtendimento> diasAtendimento; // Adicionado o campo para dias de atendimento
+    private List<DiasAtendimento> diasAtendimento; 
 
     public MedicoDTO(Medico medico) {
         this.id = medico.getId();

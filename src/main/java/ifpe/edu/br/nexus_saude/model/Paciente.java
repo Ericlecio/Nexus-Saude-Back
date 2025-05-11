@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id") // Altere para o nome correto da coluna no banco de dados
+    @Column(name = "id") 
     private Integer pacienteId;
 
     @Column(length = 100, nullable = false)
@@ -35,7 +35,7 @@ public class Paciente {
     private String planoSaude;
 
     @Column(length = 255, nullable = false)
-    private String senha; // A senha será armazenada criptografada
+    private String senha; 
 
     private LocalDateTime dataCadastro;
 
