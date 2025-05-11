@@ -1,5 +1,6 @@
 package ifpe.edu.br.nexus_saude.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -21,6 +22,9 @@ import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
 import ifpe.edu.br.nexus_saude.model.Administrador;
 import ifpe.edu.br.nexus_saude.model.Agendamento;
 import ifpe.edu.br.nexus_saude.model.ConsultaHistorico;
+import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
+import ifpe.edu.br.nexus_saude.model.Medico;
+import ifpe.edu.br.nexus_saude.model.Paciente;
 import ifpe.edu.br.nexus_saude.repository.AdministradorRepository;
 import ifpe.edu.br.nexus_saude.repository.AgendamentoRepository;
 import ifpe.edu.br.nexus_saude.repository.ConsultaHistoricoRepository;
@@ -89,7 +93,7 @@ public class AdministradorController {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
-	// 🔹 GET: List all entities (Admin overview)
+	// métodos GET, listam todos as entidades no sistema
 	@GetMapping("/medicos")
 	public List<MedicoDTO> listarMedicos() {
 		return medicoRepository.findAll().stream().map(MedicoDTO::new).toList();
@@ -114,8 +118,65 @@ public class AdministradorController {
 	public List<DiasAtendimentoDTO> listarDiasAtendimento() {
 		return diasAtendimentoRepository.findAll().stream().map(DiasAtendimentoDTO::new).toList();
 	}
+	// métodos do tipo PUT / PATCH para que o administrador atualize qualquer entidade
+	// 🔹 Atualizar um Médico
+	@PutMapping("/medico/{id}")
+	public ResponseEntity<MedicoDTO> atualizarMedico(@PathVariable Integer id, @RequestBody MedicoDTO dto) {
+		return medicoRepository.findById(id)
+				.map(medico -> {
+					medico.setNome(dto.getNome());
+					medico.setEspecialidade(dto.getEspecialidade());
+					Medico updatedMedico = medicoRepository.save(medico);
+					return ResponseEntity.ok(new MedicoDTO(updatedMedico));
+				})
+				.orElseGet(() -> ResponseEntity.notFound().build());
+	}
 
-	// 🔹 DELETE: Admin can remove any entity
+	// 🔹 Atualizar um Paciente
+	@PutMapping("/paciente/{id}")
+	public ResponseEntity<PacienteDTO> atualizarPaciente(@PathVariable Integer id, @RequestBody PacienteDTO dto) {
+		return pacienteRepository.findById(id)
+				.map(paciente -> {
+					paciente.setNomeCompleto(dto.getNomeCompleto());
+					paciente.setDataNascimento(dto.getDataNascimento());
+					Paciente updatedPaciente = pacienteRepository.save(paciente);
+					return ResponseEntity.ok(new PacienteDTO(updatedPaciente));
+				})
+				.orElseGet(() -> ResponseEntity.notFound().build());
+	}
+
+	// 🔹 Atualizar um Agendamento
+	
+
+	// 🔹 Atualizar um Histórico de Consulta
+	@PutMapping("/consulta-historico/{id}")
+	public ResponseEntity<ConsultaHistoricoDTO> atualizarConsultaHistorico(@PathVariable Integer id, @RequestBody ConsultaHistoricoDTO dto) {
+		return consultaHistoricoRepository.findById(id)
+				.map(consulta -> {
+					consulta.setEspecialidade(dto.getEspecialidade());
+					consulta.setLocal(dto.getLocal());
+					consulta.setDataAtualizacao(LocalDateTime.now());
+					ConsultaHistorico updatedConsulta = consultaHistoricoRepository.save(consulta);
+					return ResponseEntity.ok(new ConsultaHistoricoDTO(updatedConsulta));
+				})
+				.orElseGet(() -> ResponseEntity.notFound().build());
+	}
+
+	// 🔹 Atualizar Dias de Atendimento
+	@PutMapping("/dias-atendimento/{id}")
+	public ResponseEntity<DiasAtendimentoDTO> atualizarDiasAtendimento(@PathVariable Integer id, @RequestBody DiasAtendimentoDTO dto) {
+		return diasAtendimentoRepository.findById(id)
+				.map(dia -> {
+					dia.setDiaSemana(dto.getDiaSemana());
+					dia.setHorario(dto.getHorario());
+					dia.setUpdatedAt(LocalDateTime.now());
+					DiasAtendimento updatedDia = diasAtendimentoRepository.save(dia);
+					return ResponseEntity.ok(new DiasAtendimentoDTO(updatedDia));
+				})
+				.orElseGet(() -> ResponseEntity.notFound().build());
+	}
+	
+	// métodos do tipo DELETE
 	@DeleteMapping("/medico/{id}")
 	public ResponseEntity<?> deletarMedico(@PathVariable Integer id) {
 		return medicoRepository.findById(id)
