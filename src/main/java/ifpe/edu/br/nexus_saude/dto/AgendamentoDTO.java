@@ -31,7 +31,7 @@ public class AgendamentoDTO {
         this.especialidade = agendamento.getEspecialidade();
         this.local = agendamento.getLocal();
         this.medicoId = agendamento.getMedico().getId();
-        this.pacienteId = agendamento.getPaciente().getPacienteId(); // Ajustado para Integer
+        this.pacienteId = agendamento.getPaciente().getPacienteId(); 
         this.situacaoId = agendamento.getSituacao().getSituacaoId();
         this.telefoneConsultorio = agendamento.getTelefoneConsultorio();
         this.valorConsulta = agendamento.getValorConsulta();

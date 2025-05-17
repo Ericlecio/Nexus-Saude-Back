@@ -1,7 +1,9 @@
 package ifpe.edu.br.nexus_saude.controller;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,12 +37,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/admin")
+@CrossOrigin(origins = "http://localhost:5173")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdministradorController {
@@ -58,19 +63,17 @@ public class AdministradorController {
 		Administrador savedAdmin = repository.save(admin);
 		return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(savedAdmin));
 	}
-
 	@GetMapping("/listar")
-	public List<AdministradorDTO> getAdmins() {
+	public List<AdministradorDTO> getAdmins(){
 		return repository.findAll()
 				.stream()
 				.map(AdministradorDTO::new)
 				.toList();
 	}
 
-	// Atualizar um administrador
+	//Atualizar um administrador
 	@PutMapping("/{id}")
-	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id,
-			@RequestBody Administrador adminDetails) {
+	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id, @RequestBody Administrador adminDetails) {
 		return repository.findById(id)
 				.map(admin -> {
 					admin.setEmail(adminDetails.getEmail());
@@ -83,7 +86,7 @@ public class AdministradorController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	// Deletar um administrador
+	//Deletar um administrador
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteAdmin(@PathVariable Integer id) {
 		return repository.findById(id)
@@ -93,7 +96,6 @@ public class AdministradorController {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
-
 	// métodos GET, listam todos as entidades no sistema
 	@GetMapping("/medicos")
 	public List<MedicoDTO> listarMedicos() {
@@ -119,9 +121,18 @@ public class AdministradorController {
 	public List<DiasAtendimentoDTO> listarDiasAtendimento() {
 		return diasAtendimentoRepository.findAll().stream().map(DiasAtendimentoDTO::new).toList();
 	}
+	
+	@GetMapping("/dashboard-stats")
+	public Map<String, Integer> getDashboardStats() {
+	    Map<String, Integer> stats = new HashMap<>();
+	    stats.put("doctorsCount", medicoRepository.findAll().size());
+	    stats.put("patientsCount", pacienteRepository.findAll().size());
+	    stats.put("agendamentosAtivos", agendamentoRepository.findAll().size());
+	    stats.put("consultasRealizadas", consultaHistoricoRepository.findAll().size());
 
-	// métodos do tipo PUT / PATCH para que o administrador atualize qualquer
-	// entidade
+	    return stats;
+	}
+	// métodos do tipo PUT / PATCH para que o administrador atualize qualquer entidade
 	// 🔹 Atualizar um Médico
 	@PutMapping("/medico/{id}")
 	public ResponseEntity<MedicoDTO> atualizarMedico(@PathVariable Integer id, @RequestBody MedicoDTO dto) {
@@ -149,11 +160,11 @@ public class AdministradorController {
 	}
 
 	// 🔹 Atualizar um Agendamento
+	
 
 	// 🔹 Atualizar um Histórico de Consulta
 	@PutMapping("/consulta-historico/{id}")
-	public ResponseEntity<ConsultaHistoricoDTO> atualizarConsultaHistorico(@PathVariable Integer id,
-			@RequestBody ConsultaHistoricoDTO dto) {
+	public ResponseEntity<ConsultaHistoricoDTO> atualizarConsultaHistorico(@PathVariable Integer id, @RequestBody ConsultaHistoricoDTO dto) {
 		return consultaHistoricoRepository.findById(id)
 				.map(consulta -> {
 					consulta.setEspecialidade(dto.getEspecialidade());
@@ -167,8 +178,7 @@ public class AdministradorController {
 
 	// 🔹 Atualizar Dias de Atendimento
 	@PutMapping("/dias-atendimento/{id}")
-	public ResponseEntity<DiasAtendimentoDTO> atualizarDiasAtendimento(@PathVariable Integer id,
-			@RequestBody DiasAtendimentoDTO dto) {
+	public ResponseEntity<DiasAtendimentoDTO> atualizarDiasAtendimento(@PathVariable Integer id, @RequestBody DiasAtendimentoDTO dto) {
 		return diasAtendimentoRepository.findById(id)
 				.map(dia -> {
 					dia.setDiaSemana(dto.getDiaSemana());
@@ -179,7 +189,7 @@ public class AdministradorController {
 				})
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
-
+	
 	// métodos do tipo DELETE
 	@DeleteMapping("/medico/{id}")
 	public ResponseEntity<?> deletarMedico(@PathVariable Integer id) {
