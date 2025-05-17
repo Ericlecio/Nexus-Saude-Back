@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "medico")
 @Getter
@@ -61,6 +63,7 @@ public class Medico {
 
     // Relacionamento com a entidade DiasAtendimento
     @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<DiasAtendimento> diasAtendimento;
 
     @PrePersist

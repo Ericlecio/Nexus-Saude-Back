@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
 import ifpe.edu.br.nexus_saude.repository.SituacaoAgendamentoRepository;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/agendamentos")
 public class AgendamentoController {
 	private final AgendamentoRepository agendamentoRepository;

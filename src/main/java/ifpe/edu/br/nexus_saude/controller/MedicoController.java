@@ -30,19 +30,20 @@ public class MedicoController {
     // Método para cadastrar o médico e os dias de atendimento
     @PostMapping("/inserir")
     public ResponseEntity<Medico> postMedico(@RequestBody Medico medico) {
-        // Criação do médico
+        // Normaliza dados
         medico.setSenha(passwordEncoder.encode(medico.getSenha()));
         medico.setEmail(medico.getEmail().toLowerCase());
-        Medico savedMedico = medicoRepository.save(medico);
 
-        // Associando e salvando os dias de atendimento
+        // Associa o médico em cada dia de atendimento, necessário para persistência
+        // correta
         if (medico.getDiasAtendimento() != null && !medico.getDiasAtendimento().isEmpty()) {
             for (DiasAtendimento diaAtendimento : medico.getDiasAtendimento()) {
-                diaAtendimento.setMedico(savedMedico); // Associando o médico
-                diasAtendimentoRepository.save(diaAtendimento); // Salvando os dias de atendimento
+                diaAtendimento.setMedico(medico); // Associação direta antes de salvar
             }
         }
 
+        // Salva tudo de uma vez (inclusive os dias) com CascadeType.ALL
+        Medico savedMedico = medicoRepository.save(medico);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMedico);
     }
 

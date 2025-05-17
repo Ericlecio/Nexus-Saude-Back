@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "dias_atendimento")
 @Data
@@ -20,7 +22,8 @@ public class DiasAtendimento {
     private Integer diasAtendimentoId;
 
     @ManyToOne
-    @JoinColumn(name = "medico_id", nullable = false)
+    @JoinColumn(name = "medico_id")
+    @JsonBackReference
     private Medico medico;
 
     @Column(nullable = false, length = 20)
