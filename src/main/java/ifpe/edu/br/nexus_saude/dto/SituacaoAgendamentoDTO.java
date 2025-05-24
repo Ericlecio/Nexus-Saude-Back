@@ -1,20 +1,21 @@
 package ifpe.edu.br.nexus_saude.dto;
 
 import ifpe.edu.br.nexus_saude.model.SituacaoAgendamento;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SituacaoAgendamentoDTO {
-	private Integer situacaoId;
+    private Integer situacaoId;
     private String descricao;
+
+    public SituacaoAgendamentoDTO(SituacaoAgendamento situacao) {
+        this.situacaoId = situacao.getSituacaoId();
+        this.descricao = situacao.getDescricao();
+    }
 
     public SituacaoAgendamento toEntity() {
         return SituacaoAgendamento.builder()
@@ -22,5 +23,4 @@ public class SituacaoAgendamentoDTO {
                 .descricao(this.descricao)
                 .build();
     }
-
 }

@@ -29,7 +29,7 @@ public class MedicoDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private List<DiasAtendimento> diasAtendimento; 
+    private List<DiasAtendimento> diasAtendimento;
 
     public MedicoDTO(Medico medico) {
         this.id = medico.getId();
@@ -47,6 +47,7 @@ public class MedicoDTO {
         this.dataCadastro = medico.getDataCadastro();
         this.createdAt = medico.getCreatedAt();
         this.updatedAt = medico.getUpdatedAt();
-
+        this.diasAtendimento = medico.getDiasAtendimento();
     }
+
 }

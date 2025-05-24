@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -22,7 +22,7 @@ public class PacienteController {
     private PacienteRepository repository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder; 
+    private BCryptPasswordEncoder passwordEncoder;
 
     // Método para listar todos os pacientes
     @GetMapping("/listar")
@@ -36,7 +36,7 @@ public class PacienteController {
     // Método para obter os dados de um paciente específico por ID
     @GetMapping("/{pacienteId}")
     public ResponseEntity<PacienteDTO> getPaciente(@PathVariable Integer pacienteId) {
-        Optional<Paciente> paciente = repository.findById(pacienteId); 
+        Optional<Paciente> paciente = repository.findById(pacienteId);
         return paciente.map(p -> ResponseEntity.ok(new PacienteDTO(p)))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -75,12 +75,11 @@ public class PacienteController {
     public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
         paciente.setEmail(paciente.getEmail().toLowerCase());
 
-        // Criptografando a senha ao criar o paciente
         if (paciente.getSenha() != null) {
             paciente.setSenha(passwordEncoder.encode(paciente.getSenha()));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); 
-                                                                             
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
         }
 
         Paciente savedPaciente = repository.save(paciente);
@@ -96,13 +95,11 @@ public class PacienteController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente não encontrado.");
         }
 
-        // Verificando se a senha antiga é válida
         boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(), paciente.getSenha());
         if (!senhaValida) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha antiga incorreta.");
         }
 
-        // Criptografando a nova senha e atualizando o paciente
         String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
         paciente.setSenha(novaSenhaCriptografada);
         repository.save(paciente);
