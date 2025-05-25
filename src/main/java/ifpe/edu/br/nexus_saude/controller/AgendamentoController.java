@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -140,4 +141,27 @@ public class AgendamentoController {
 		agendamentoRepository.delete(agendamento.get());
 		return ResponseEntity.noContent().build();
 	}
+
+	@GetMapping("/listarPorMedico")
+	public ResponseEntity<List<AgendamentoDTO>> listarPorMedico(
+			@RequestParam Integer medicoId,
+			@RequestParam(required = false) String situacao) {
+
+		List<Agendamento> agendamentos = agendamentoRepository.findByMedicoId(medicoId);
+
+		if (situacao != null && !situacao.trim().isEmpty()) {
+			String filtroLower = situacao.trim().toLowerCase();
+			agendamentos = agendamentos.stream()
+					.filter(a -> a.getSituacao().getDescricao() != null &&
+							a.getSituacao().getDescricao().trim().toLowerCase().equals(filtroLower))
+					.collect(Collectors.toList());
+		}
+
+		List<AgendamentoDTO> dtos = agendamentos.stream()
+				.map(AgendamentoDTO::new)
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(dtos);
+	}
+
 }

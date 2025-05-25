@@ -15,4 +15,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
     boolean existsByMedicoIdAndData(Integer medicoId, LocalDateTime data);
 
     boolean existsByMedicoIdAndDataAndAgendamentoIdNot(Integer medicoId, LocalDateTime data, Integer agendamentoId);
+
+    List<Agendamento> findByMedicoId(Integer medicoId);
+
 }
