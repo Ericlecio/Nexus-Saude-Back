@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/agendamento")
 public class AgendamentoController {
 
@@ -36,7 +36,6 @@ public class AgendamentoController {
 	@Autowired
 	private SituacaoAgendamentoRepository situacaoRepository;
 
-	// Listar todos os agendamentos
 	@GetMapping("/listar")
 	public List<AgendamentoDTO> listar() {
 		return agendamentoRepository.findAll()
@@ -45,7 +44,6 @@ public class AgendamentoController {
 				.toList();
 	}
 
-	// Obter agendamento por id
 	@GetMapping("/{id}")
 	public ResponseEntity<AgendamentoDTO> obterPorId(@PathVariable Integer id) {
 		Optional<Agendamento> agendamento = agendamentoRepository.findById(id);
@@ -53,12 +51,11 @@ public class AgendamentoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	// Inserir novo agendamento
 	@PostMapping("/inserir")
 	public ResponseEntity<AgendamentoDTO> inserir(@RequestBody AgendamentoDTO dto) {
 		Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
 		Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId());
-		Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(dto.getSituacaoId());
+		Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(1); // sempre 'Agendado'
 
 		if (paciente.isEmpty() || medico.isEmpty() || situacao.isEmpty()) {
 			return ResponseEntity.badRequest().build();
@@ -70,7 +67,7 @@ public class AgendamentoController {
 				.local(dto.getLocal())
 				.medico(medico.get())
 				.paciente(paciente.get())
-				.situacao(situacao.get())
+				.situacao(situacao.get()) // força sempre a situação "Agendado"
 				.telefoneConsultorio(dto.getTelefoneConsultorio())
 				.valorConsulta(dto.getValorConsulta())
 				.createdAt(LocalDateTime.now())
@@ -81,7 +78,6 @@ public class AgendamentoController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(new AgendamentoDTO(saved));
 	}
 
-	// Atualizar agendamento
 	@PutMapping("/update/{id}")
 	public ResponseEntity<AgendamentoDTO> atualizar(@PathVariable Integer id, @RequestBody AgendamentoDTO dto) {
 		Optional<Agendamento> optAgendamento = agendamentoRepository.findById(id);
@@ -112,7 +108,6 @@ public class AgendamentoController {
 		return ResponseEntity.ok(new AgendamentoDTO(updated));
 	}
 
-	// Deletar agendamento
 	@DeleteMapping("/deletar/{id}")
 	public ResponseEntity<?> deletar(@PathVariable Integer id) {
 		Optional<Agendamento> agendamento = agendamentoRepository.findById(id);
