@@ -51,14 +51,29 @@ public class AgendamentoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
+	// NOVO: listar agendamentos futuros para um médico
+	@GetMapping("/medico/{medicoId}")
+	public List<AgendamentoDTO> listarPorMedico(@PathVariable Integer medicoId) {
+		return agendamentoRepository.findByMedicoIdAndDataAfter(medicoId, LocalDateTime.now())
+				.stream()
+				.map(AgendamentoDTO::new)
+				.toList();
+	}
+
 	@PostMapping("/inserir")
-	public ResponseEntity<AgendamentoDTO> inserir(@RequestBody AgendamentoDTO dto) {
+	public ResponseEntity<?> inserir(@RequestBody AgendamentoDTO dto) {
 		Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
 		Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId());
 		Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(1); // sempre 'Agendado'
 
 		if (paciente.isEmpty() || medico.isEmpty() || situacao.isEmpty()) {
-			return ResponseEntity.badRequest().build();
+			return ResponseEntity.badRequest().body("Paciente, Médico ou Situação inválidos.");
+		}
+
+		boolean existeConflito = agendamentoRepository.existsByMedicoIdAndData(medico.get().getId(), dto.getData());
+		if (existeConflito) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("Já existe um agendamento para esse médico no horário escolhido.");
 		}
 
 		Agendamento agendamento = Agendamento.builder()
@@ -67,7 +82,7 @@ public class AgendamentoController {
 				.local(dto.getLocal())
 				.medico(medico.get())
 				.paciente(paciente.get())
-				.situacao(situacao.get()) // força sempre a situação "Agendado"
+				.situacao(situacao.get())
 				.telefoneConsultorio(dto.getTelefoneConsultorio())
 				.valorConsulta(dto.getValorConsulta())
 				.createdAt(LocalDateTime.now())
@@ -79,7 +94,7 @@ public class AgendamentoController {
 	}
 
 	@PutMapping("/update/{id}")
-	public ResponseEntity<AgendamentoDTO> atualizar(@PathVariable Integer id, @RequestBody AgendamentoDTO dto) {
+	public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody AgendamentoDTO dto) {
 		Optional<Agendamento> optAgendamento = agendamentoRepository.findById(id);
 		if (optAgendamento.isEmpty()) {
 			return ResponseEntity.notFound().build();
@@ -90,7 +105,15 @@ public class AgendamentoController {
 		Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(dto.getSituacaoId());
 
 		if (paciente.isEmpty() || medico.isEmpty() || situacao.isEmpty()) {
-			return ResponseEntity.badRequest().build();
+			return ResponseEntity.badRequest().body("Paciente, Médico ou Situação inválidos.");
+		}
+
+		boolean existeConflito = agendamentoRepository.existsByMedicoIdAndDataAndAgendamentoIdNot(
+				medico.get().getId(), dto.getData(), id);
+
+		if (existeConflito) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("Já existe um agendamento para esse médico no horário escolhido.");
 		}
 
 		Agendamento agendamento = optAgendamento.get();
