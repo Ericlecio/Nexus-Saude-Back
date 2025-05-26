@@ -1,6 +1,7 @@
 package ifpe.edu.br.nexus_saude.controller;
 
 import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
+import ifpe.edu.br.nexus_saude.dto.RegistroPacienteRequestDTO;
 import ifpe.edu.br.nexus_saude.model.Paciente;
 import ifpe.edu.br.nexus_saude.model.Papel;
 import ifpe.edu.br.nexus_saude.model.Usuario;
@@ -197,5 +198,5 @@ public class PacienteController {
         return ResponseEntity.ok("Senha alterada com sucesso.");
     }
 
-
+	
 }
