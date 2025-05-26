@@ -25,14 +25,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
         http
-            // Configuração CSRF - ajuste conforme necessidade (ex: desabilitar para APIs stateless com JWT)
-            // Para formLogin e SPA na mesma origem ou com configuração CORS cuidadosa:
+            
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                 // .ignoringRequestMatchers("/api/public/**") // Se tiver rotas que não precisam de CSRF
+               
             )
-            // .csrf(csrf -> csrf.disable()) // Descomente esta linha se for uma API REST pura com JWT e sem cookies de sessão
-
+            
             .authorizeHttpRequests(authorize -> authorize
                 // Endpoints Públicos (login, registro de usuários, recursos estáticos)
                 .requestMatchers("/auth/**", "/login", "/error").permitAll()
