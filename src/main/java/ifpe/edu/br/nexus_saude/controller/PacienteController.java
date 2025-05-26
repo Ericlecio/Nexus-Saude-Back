@@ -9,8 +9,8 @@ import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
 import ifpe.edu.br.nexus_saude.repository.PapelRepository;
 import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
 import jakarta.validation.Valid;
-
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -67,30 +68,8 @@ public class PacienteController {
                 .map(PacienteDTO::new) // PacienteDTO precisa ser ajustado para pegar email do Usuario
                 .collect(Collectors.toList());
     }
+	
 	 @GetMapping("/{pacienteId}")
-	    @PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')") // Admin, o próprio paciente ou médico podem ver
-	    public ResponseEntity<PacienteDTO> getPaciente(@PathVariable Integer pacienteId) {
-	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	        String currentPrincipalName = authentication.getName(); // email
-
-	        Optional<Paciente> pacienteOpt = pacienteRepository.findById(pacienteId);
-	        if (pacienteOpt.isEmpty()) {
-	            return ResponseEntity.notFound().build();
-	        }
-	        Paciente paciente = pacienteOpt.get();
-
-	        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-	        boolean isMedico = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MEDICO"));
-	        // TODO: Médicos só podem ver pacientes que eles atendem? Lógica mais complexa aqui.
-	        // Por enquanto, médico pode ver qualquer paciente se tiver o papel.
-
-	        if (isAdmin || isMedico || paciente.getUsuario().getEmail().equals(currentPrincipalName)) {
-	            return ResponseEntity.ok(new PacienteDTO(paciente));
-	        } else {
-	            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-	        }
-	    }
-	@DeleteMapping("/{pacienteId}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')") // Admin, o próprio paciente ou médico podem ver
     public ResponseEntity<PacienteDTO> getPaciente(@PathVariable Integer pacienteId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -196,6 +175,17 @@ public class PacienteController {
         pacienteRepository.save(paciente); // Salva Paciente, que cascateia para Usuario
 
         return ResponseEntity.ok("Senha alterada com sucesso.");
+    }
+	
+	 // Classe interna RedefinirSenhaRequest já existe no seu código
+    public static class RedefinirSenhaRequest {
+        private String senhaAntiga; // Obrigatória se for o próprio paciente, opcional se for admin
+        private String novaSenha;
+
+        public String getSenhaAntiga() { return senhaAntiga; }
+        public void setSenhaAntiga(String senhaAntiga) { this.senhaAntiga = senhaAntiga; }
+        public String getNovaSenha() { return novaSenha; }
+        public void setNovaSenha(String novaSenha) { this.novaSenha = novaSenha; }
     }
 
 	

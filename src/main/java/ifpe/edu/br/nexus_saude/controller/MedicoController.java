@@ -11,7 +11,7 @@ import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import ifpe.edu.br.nexus_saude.repository.PapelRepository;
 import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
 import jakarta.validation.Valid;
-
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
