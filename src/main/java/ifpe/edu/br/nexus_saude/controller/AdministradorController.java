@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,18 +21,24 @@ import ifpe.edu.br.nexus_saude.dto.ConsultaHistoricoDTO;
 import ifpe.edu.br.nexus_saude.dto.DiasAtendimentoDTO;
 import ifpe.edu.br.nexus_saude.dto.MedicoDTO;
 import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
+import ifpe.edu.br.nexus_saude.dto.RegistroAdminRequestDTO;
 import ifpe.edu.br.nexus_saude.model.Administrador;
 import ifpe.edu.br.nexus_saude.model.Agendamento;
 import ifpe.edu.br.nexus_saude.model.ConsultaHistorico;
 import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import ifpe.edu.br.nexus_saude.model.Paciente;
+import ifpe.edu.br.nexus_saude.model.Papel;
+import ifpe.edu.br.nexus_saude.model.Usuario;
 import ifpe.edu.br.nexus_saude.repository.AdministradorRepository;
 import ifpe.edu.br.nexus_saude.repository.AgendamentoRepository;
 import ifpe.edu.br.nexus_saude.repository.ConsultaHistoricoRepository;
 import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
 import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
+import ifpe.edu.br.nexus_saude.repository.PapelRepository;
+import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,51 +55,85 @@ import org.springframework.web.bind.annotation.PathVariable;
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdministradorController {
-	private final AdministradorRepository repository;
+	private final AdministradorRepository administradorRepository;
+	private final UsuarioRepository usuarioRepository;
+	private final PapelRepository papelRepository;
+	private final PasswordEncoder passwordEncoder;
+
+	// Injeção de outras dependências (MedicoRepository, etc.)
 	private final MedicoRepository medicoRepository;
 	private final PacienteRepository pacienteRepository;
 	private final AgendamentoRepository agendamentoRepository;
 	private final ConsultaHistoricoRepository consultaHistoricoRepository;
 	private final DiasAtendimentoRepository diasAtendimentoRepository;
-	private final PasswordEncoder passwordEncoder;
 
-	@PostMapping("/admin")
-	public ResponseEntity<AdministradorDTO> postAdmin(@RequestBody Administrador admin) {
-		admin.setSenha(passwordEncoder.encode(admin.getSenha()));
-		Administrador savedAdmin = repository.save(admin);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(savedAdmin));
+	@PostMapping("/registrar") // Novo endpoint para registrar admin (pode ser público inicialmente ou protegido)
+	@PreAuthorize("permitAll()") // Exemplo: permitir que qualquer um registre o primeiro admin, depois proteger
+	public ResponseEntity<?> registrarAdmin(@Valid @RequestBody RegistroAdminRequestDTO requestDTO) {
+		if (usuarioRepository.existsByEmail(requestDTO.getEmail())) {
+			return ResponseEntity.badRequest().body("Erro: Email já está em uso!");
+		}
+
+		Usuario usuario = new Usuario(requestDTO.getEmail(), passwordEncoder.encode(requestDTO.getSenha()));
+		Papel adminPapel = papelRepository.findByNome("ADMIN")
+				.orElseGet(() -> papelRepository.save(new Papel("ADMIN"))); // Cria se não existir
+		usuario.setPapeis(Set.of(adminPapel));
+		// Não precisa salvar o usuário aqui se o cascade estiver configurado em Administrador.usuario
+
+		Administrador admin = new Administrador();
+		admin.setUsuario(usuario);
+		// admin.setNomeCompleto(requestDTO.getNomeCompleto()); // Se tiver este campo no DTO
+
+		Administrador savedAdmin = administradorRepository.save(admin);
+		// Use um DTO de resposta para não expor a senha ou detalhes excessivos
+		return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(savedAdmin.getId(), savedAdmin.getUsuario().getEmail()));
 	}
 
-	@GetMapping("/listar")
-	public List<AdministradorDTO> getAdmins() {
-		return repository.findAll()
-				.stream()
-				.map(AdministradorDTO::new)
-				.toList();
-	}
+	// Endpoint antigo de postAdmin precisa ser revisto ou removido se /registrar cobrir o caso
+	// @PostMapping("/admin") // Este endpoint parece redundante com /registrar
+	// @PreAuthorize("hasRole('ADMIN')")
+	// public ResponseEntity<AdministradorDTO> postAdmin(@RequestBody Administrador admin) {
+	//     // A lógica aqui precisa ser adaptada para usar a entidade Usuario
+	//     // e provavelmente deveria usar um DTO de request também.
+	//     // admin.getUsuario().setSenha(passwordEncoder.encode(admin.getUsuario().getSenha()));
+	//     // Administrador savedAdmin = repository.save(admin);
+	//     // return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(savedAdmin));
+	//     return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build(); // Exemplo
+	// }
 
-	// Atualizar um administrador
+	//Atualizar um administrador
 	@PutMapping("/{id}")
-	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id,
-			@RequestBody Administrador adminDetails) {
-		return repository.findById(id)
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id, @RequestBody RegistroAdminRequestDTO adminDetailsDTO) {
+		return administradorRepository.findById(id)
+
 				.map(admin -> {
-					admin.setEmail(adminDetails.getEmail());
-					if (adminDetails.getSenha() != null && !adminDetails.getSenha().isEmpty()) {
-						admin.setSenha(passwordEncoder.encode(adminDetails.getSenha()));
+					Usuario usuario = admin.getUsuario();
+					// Atualizar email apenas se fornecido e diferente, e não existente
+					if (adminDetailsDTO.getEmail() != null && !adminDetailsDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
+						if (usuarioRepository.existsByEmail(adminDetailsDTO.getEmail())) {
+							throw new RuntimeException("Email já em uso por outro usuário."); // Ou retorne BadRequest
+						}
+						usuario.setEmail(adminDetailsDTO.getEmail());
 					}
-					Administrador updatedAdmin = repository.save(admin);
-					return ResponseEntity.ok(new AdministradorDTO(updatedAdmin));
+					if (adminDetailsDTO.getSenha() != null && !adminDetailsDTO.getSenha().isEmpty()) {
+						usuario.setSenha(passwordEncoder.encode(adminDetailsDTO.getSenha()));
+					}
+					// admin.setNomeCompleto(adminDetailsDTO.getNomeCompleto()); // Se tiver
+					// usuarioRepository.save(usuario); // Salvo em cascata por admin
+					Administrador updatedAdmin = administradorRepository.save(admin);
+					return ResponseEntity.ok(new AdministradorDTO(updatedAdmin.getId(), updatedAdmin.getUsuario().getEmail()));
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	// Deletar um administrador
+
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> deleteAdmin(@PathVariable Integer id) {
-		return repository.findById(id)
+		return administradorRepository.findById(id)
 				.map(admin -> {
-					repository.delete(admin);
+					administradorRepository.delete(admin); // Cascade deve remover o Usuario associado se orphanRemoval=true
 					return ResponseEntity.noContent().<Void>build();
 				})
 				.orElse(ResponseEntity.notFound().build());

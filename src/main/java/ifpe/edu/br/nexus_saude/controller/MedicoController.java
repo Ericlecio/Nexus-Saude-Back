@@ -1,109 +1,162 @@
 package ifpe.edu.br.nexus_saude.controller;
 
 import ifpe.edu.br.nexus_saude.dto.MedicoDTO;
-import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
+import ifpe.edu.br.nexus_saude.dto.RegistroMedicoRequestDTO;
+// import ifpe.edu.br.nexus_saude.model.DiasAtendimento; // Não usado diretamente neste trecho
 import ifpe.edu.br.nexus_saude.model.Medico;
+import ifpe.edu.br.nexus_saude.model.Papel;
+import ifpe.edu.br.nexus_saude.model.Usuario;
+import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
+import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
+import ifpe.edu.br.nexus_saude.repository.PapelRepository;
+import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
+import jakarta.validation.Valid;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication; // <-- IMPORT CORRIGIDO
 import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/medico")
 public class MedicoController {
 
-    @Autowired
-    private MedicoRepository medicoRepository;
+	@Autowired private MedicoRepository medicoRepository;
+	@Autowired private UsuarioRepository usuarioRepository;
+	@Autowired private PapelRepository papelRepository;
+	@Autowired private PasswordEncoder passwordEncoder;
+	@Autowired private DiasAtendimentoRepository diasAtendimentoRepository;
 
-    @Autowired
-    private DiasAtendimentoRepository diasAtendimentoRepository;
+	@PostMapping("/registrar")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> registrarMedico(@Valid @RequestBody RegistroMedicoRequestDTO requestDTO) {
+		if (usuarioRepository.existsByEmail(requestDTO.getEmail())) {
+			return ResponseEntity.badRequest().body("Erro: Email já está em uso!");
+		}
+		// Lembre-se de adicionar existsByCrm e existsByCpf ao MedicoRepository
+		if (medicoRepository.existsByCrm(requestDTO.getCrm())) {
+			return ResponseEntity.badRequest().body("Erro: CRM já está em uso!");
+		}
+		if (medicoRepository.existsByCpf(requestDTO.getCpf())) {
+			return ResponseEntity.badRequest().body("Erro: CPF já está em uso!");
+		}
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+		Usuario usuario = new Usuario(requestDTO.getEmail(), passwordEncoder.encode(requestDTO.getSenha()));
+		Papel medicoPapel = papelRepository.findByNome("MEDICO")
+				.orElseGet(() -> papelRepository.save(new Papel("MEDICO")));
+		usuario.setPapeis(Set.of(medicoPapel));
 
-    // Listar todos os médicos (retornando lista de DTOs)
-    @GetMapping("/listar")
-    public List<MedicoDTO> listar() {
-        return medicoRepository.findAll()
-                .stream()
-                .map(MedicoDTO::new)
-                .toList();
-    }
+		Medico medico = new Medico();
+		medico.setUsuario(usuario);
+		medico.setNome(requestDTO.getNome());
+		medico.setCrm(requestDTO.getCrm());
+		medico.setEspecialidade(requestDTO.getEspecialidade());
+		medico.setCpf(requestDTO.getCpf());
+		medico.setSexo(requestDTO.getSexo());
+		// Configure outros campos do medico a partir do DTO (dataNascimento, telefoneConsultorio, etc.)
+		// Ex: medico.setDataNascimento(requestDTO.getDataNascimento());
+		// medico.setTelefoneConsultorio(requestDTO.getTelefoneConsultorio());
+		// medico.setTempoConsulta(requestDTO.getTempoConsulta());
+		// medico.setUf(requestDTO.getUf());
+		// medico.setValorConsulta(requestDTO.getValorConsulta());
 
-    // Buscar médico por id (retorna DTO)
-    @GetMapping("/{id}")
-    public ResponseEntity<MedicoDTO> obterPorId(@PathVariable Integer id) {
-        return medicoRepository.findById(id)
-                .map(medico -> ResponseEntity.ok(new MedicoDTO(medico)))
-                .orElse(ResponseEntity.notFound().build());
-    }
 
-    // Inserir novo médico
-    @PostMapping("/inserir")
-    public ResponseEntity<MedicoDTO> inserir(@RequestBody Medico medico) {
-        // Normaliza dados e criptografa senha
-        medico.setEmail(medico.getEmail().toLowerCase());
-        medico.setSenha(passwordEncoder.encode(medico.getSenha()));
+		Medico savedMedico = medicoRepository.save(medico);
+		return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
+	}
 
-        // Associa os dias de atendimento ao médico
-        if (medico.getDiasAtendimento() != null && !medico.getDiasAtendimento().isEmpty()) {
-            for (DiasAtendimento dia : medico.getDiasAtendimento()) {
-                dia.setMedico(medico);
-            }
-        }
+	@GetMapping("/listar")
+	@PreAuthorize("hasRole('ADMIN')")
+	public List<MedicoDTO> getMedicos() {
+		return medicoRepository.findAll()
+				.stream()
+				.map(MedicoDTO::new)
+				.collect(Collectors.toList());
+	}
 
-        Medico salvo = medicoRepository.save(medico);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(salvo));
-    }
+	@GetMapping("/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
+	public ResponseEntity<MedicoDTO> getMedicoById(@PathVariable Integer id) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentPrincipalName = authentication.getName();
 
-    // Atualizar médico
-    @PutMapping("/update/{id}")
-    public ResponseEntity<MedicoDTO> atualizar(@PathVariable Integer id, @RequestBody Medico medicoAtualizado) {
-        return medicoRepository.findById(id)
-                .map(medico -> {
-                    medico.setNome(medicoAtualizado.getNome());
-                    medico.setEmail(medicoAtualizado.getEmail().toLowerCase());
-                    if (medicoAtualizado.getSenha() != null && !medicoAtualizado.getSenha().isEmpty()) {
-                        medico.setSenha(passwordEncoder.encode(medicoAtualizado.getSenha()));
-                    }
-                    medico.setCrm(medicoAtualizado.getCrm());
-                    medico.setEspecialidade(medicoAtualizado.getEspecialidade());
+		return medicoRepository.findById(id)
+				.map(medico -> {
+					boolean isAdmin = authentication.getAuthorities().stream()
+							.anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN"));
+					if (!isAdmin && (medico.getUsuario() == null || !medico.getUsuario().getEmail().equals(currentPrincipalName))) {
+						return ResponseEntity.status(HttpStatus.FORBIDDEN).<MedicoDTO>build();
+					}
+					return ResponseEntity.ok(new MedicoDTO(medico));
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
 
-                    if (medicoAtualizado.getDiasAtendimento() != null) {
-                        medico.getDiasAtendimento().clear();
-                        for (DiasAtendimento dia : medicoAtualizado.getDiasAtendimento()) {
-                            dia.setMedico(medico);
-                            medico.getDiasAtendimento().add(dia);
-                        }
-                    }
 
-                    Medico atualizado = medicoRepository.save(medico);
-                    return ResponseEntity.ok(new MedicoDTO(atualizado));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
+	@PutMapping("/update/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
+	public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id, @Valid @RequestBody RegistroMedicoRequestDTO medicoAtualizadoDTO) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentPrincipalName = authentication.getName();
 
-    @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<?> deletar(@PathVariable Integer id) {
-        Optional<Medico> medico = medicoRepository.findById(id);
-        if (medico.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        try {
-            medicoRepository.delete(medico.get());
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Não foi possível deletar o médico. Verifique se há registros vinculados.");
-        }
-    }
+		return medicoRepository.findById(id)
+				.map(medico -> {
+					boolean isAdmin = authentication.getAuthorities().stream()
+							.anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN"));
+					if (!isAdmin && (medico.getUsuario() == null || !medico.getUsuario().getEmail().equals(currentPrincipalName))) {
+						return ResponseEntity.status(HttpStatus.FORBIDDEN).<MedicoDTO>build();
+					}
 
+					Usuario usuario = medico.getUsuario();
+					if (medicoAtualizadoDTO.getEmail() != null && !medicoAtualizadoDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
+						if (usuarioRepository.existsByEmail(medicoAtualizadoDTO.getEmail())) {
+							throw new RuntimeException("Email já em uso.");
+						}
+						usuario.setEmail(medicoAtualizadoDTO.getEmail());
+					}
+					if (medicoAtualizadoDTO.getSenha() != null && !medicoAtualizadoDTO.getSenha().isEmpty()) {
+						usuario.setSenha(passwordEncoder.encode(medicoAtualizadoDTO.getSenha()));
+					}
+
+					medico.setNome(medicoAtualizadoDTO.getNome());
+					medico.setEspecialidade(medicoAtualizadoDTO.getEspecialidade());
+					// Atualize outros campos conforme necessário, por exemplo:
+					// medico.setSexo(medicoAtualizadoDTO.getSexo());
+					// medico.setDataNascimento(medicoAtualizadoDTO.getDataNascimento());
+					// medico.setTelefoneConsultorio(medicoAtualizadoDTO.getTelefoneConsultorio());
+					// medico.setTempoConsulta(medicoAtualizadoDTO.getTempoConsulta());
+					// medico.setUf(medicoAtualizadoDTO.getUf());
+					// medico.setValorConsulta(medicoAtualizadoDTO.getValorConsulta());
+					// CRM e CPF geralmente não são atualizados ou requerem lógica de negócio específica.
+
+					Medico updated = medicoRepository.save(medico);
+					return ResponseEntity.ok(new MedicoDTO(updated));
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+
+	@DeleteMapping("/deletar/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<Object> deleteMedico(@PathVariable Integer id) {
+		return medicoRepository.findById(id)
+				.map(medico -> {
+					medicoRepository.delete(medico);
+					return ResponseEntity.noContent().build();
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
 }

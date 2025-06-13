@@ -17,11 +17,15 @@ public class Paciente {
     @Column(name = "id") 
     private Integer pacienteId;
 
+    
+    @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
+    private Usuario usuario;
+    
     @Column(length = 100, nullable = false)
     private String nomeCompleto;
 
-    @Column(length = 50, nullable = false, unique = true)
-    private String email;
+   // email e senha estão na class usuario
 
     @Column(length = 15, nullable = false)
     private String telefone;
@@ -32,10 +36,7 @@ public class Paciente {
     private LocalDate dataNascimento;
 
     @Column(length = 50)
-    private String planoSaude;
-
-    @Column(length = 255, nullable = false)
-    private String senha; 
+    private String planoSaude; 
 
     private LocalDateTime dataCadastro;
 
@@ -46,7 +47,7 @@ public class Paciente {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.dataCadastro = LocalDateTime.now();
+        this.dataCadastro = LocalDateTime.now(); // dataCadastro já existe e é setado aqui
     }
 
     @PreUpdate
@@ -56,7 +57,7 @@ public class Paciente {
 
     @Override
     public String toString() {
-        return "Paciente [pacienteId=" + pacienteId + ", nomeCompleto=" + nomeCompleto + ", email=" + email +
+        return "Paciente [pacienteId=" + pacienteId + ", nomeCompleto=" + nomeCompleto + (usuario != null ? ", email=" + usuario.getEmail() : "") +
                 ", cpf=" + cpf + ", planoSaude=" + planoSaude + "]";
     }
 }
