@@ -37,7 +37,7 @@ public class SecurityConfig {
 
 		.authorizeHttpRequests(authorize -> authorize
 				// Endpoints Públicos (login, registro de usuários, recursos estáticos)
-				.requestMatchers("/auth/**", "/login", "/error").permitAll()
+				.requestMatchers("/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/admin/registrar").permitAll() // Endpoint de registro para Admin
 				.requestMatchers(HttpMethod.POST, "/medico/registrar").permitAll() // Endpoint de registro para Medico
 				.requestMatchers(HttpMethod.POST, "/paciente/registrar").permitAll() // Endpoint de registro para Paciente
