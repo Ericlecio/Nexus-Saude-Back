@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate; // Alterado para LocalDate
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PacienteDTO {
 	private Integer id; // Mantido como 'id' para consistência com o DTO, mas refere-se a pacienteId na entidade
+
+    private Integer id;
     private String nomeCompleto;
     private String email; // Virá do Usuario associado
     private String telefone;
@@ -23,7 +25,6 @@ public class PacienteDTO {
     private LocalDateTime updatedAt;
     private Long usuarioId; // Opcional: se você quiser expor o ID do usuário associado
 
-    // Construtor que recebe um Paciente e mapeia os campos
     public PacienteDTO(Paciente paciente) {
         this.id = paciente.getPacienteId();
         this.nomeCompleto = paciente.getNomeCompleto();

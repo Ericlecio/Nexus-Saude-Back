@@ -13,6 +13,9 @@ import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication; // <-- IMPORT CORRIGIDO
+import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
+import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +24,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/medico")
 public class MedicoController {
+
 	@Autowired private MedicoRepository medicoRepository;
 	@Autowired private UsuarioRepository usuarioRepository;
 	@Autowired private PapelRepository papelRepository;
@@ -99,17 +105,6 @@ public class MedicoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	/* MÉTODO REMOVIDO (deleteMedico1) pois estava incorreto e redundante
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Object> deleteMedico1(@PathVariable Integer id) {
-		return repository.findById(id) // 'repository' não está definido
-				.map(medico -> {
-					repository.delete(medico);
-					return ResponseEntity.noContent().build();
-				})
-				.orElse(ResponseEntity.notFound().build());
-	}
-	 */
 
 	@PutMapping("/update/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
@@ -152,6 +147,7 @@ public class MedicoController {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
+
 
 	@DeleteMapping("/deletar/{id}")
 	@PreAuthorize("hasRole('ADMIN')")

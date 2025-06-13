@@ -4,7 +4,6 @@ import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import ifpe.edu.br.nexus_saude.model.Usuario; // Importe a entidade Usuario
 import lombok.*; // Manteve Getter, Setter, NoArgsConstructor, AllArgsConstructor
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,9 +32,11 @@ public class MedicoDTO {
     private LocalDateTime updatedAt;
     private Long usuarioId; // Opcional: se você quiser expor o ID do usuário associado
 
+y
     // Se DiasAtendimento também tiver um DTO, use-o aqui.
     // Por enquanto, mantendo a entidade, mas idealmente seria List<DiasAtendimentoDTO>
     private List<DiasAtendimentoDTO> diasAtendimento;
+
 
     public MedicoDTO(Medico medico) {
         this.id = medico.getId();
@@ -73,5 +74,7 @@ public class MedicoDTO {
                     ))
                     .collect(Collectors.toList());
         }
+
     }
+
 }

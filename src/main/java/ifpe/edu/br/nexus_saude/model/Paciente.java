@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "paciente")
@@ -12,11 +11,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id") 
     private Integer pacienteId;
+
     
     @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
@@ -36,7 +36,7 @@ public class Paciente {
     private LocalDate dataNascimento;
 
     @Column(length = 50)
-    private String planoSaude;
+    private String planoSaude; 
 
     private LocalDateTime dataCadastro;
 

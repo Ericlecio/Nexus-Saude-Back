@@ -15,6 +15,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository; // Para 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true) // Para @PreAuthorize funcionar
+
 public class SecurityConfig {
 
 	@Bean
@@ -23,6 +24,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
+
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
 		http
 

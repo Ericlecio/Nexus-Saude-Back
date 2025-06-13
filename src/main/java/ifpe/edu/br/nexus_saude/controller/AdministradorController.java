@@ -44,7 +44,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,7 +66,6 @@ public class AdministradorController {
 	private final AgendamentoRepository agendamentoRepository;
 	private final ConsultaHistoricoRepository consultaHistoricoRepository;
 	private final DiasAtendimentoRepository diasAtendimentoRepository;
-
 
 	@PostMapping("/registrar") // Novo endpoint para registrar admin (pode ser público inicialmente ou protegido)
 	@PreAuthorize("permitAll()") // Exemplo: permitir que qualquer um registre o primeiro admin, depois proteger
@@ -108,6 +106,7 @@ public class AdministradorController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id, @RequestBody RegistroAdminRequestDTO adminDetailsDTO) {
 		return administradorRepository.findById(id)
+
 				.map(admin -> {
 					Usuario usuario = admin.getUsuario();
 					// Atualizar email apenas se fornecido e diferente, e não existente
@@ -128,6 +127,7 @@ public class AdministradorController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
+
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> deleteAdmin(@PathVariable Integer id) {
@@ -138,6 +138,7 @@ public class AdministradorController {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
+
 	// métodos GET, listam todos as entidades no sistema
 	@GetMapping("/medicos")
 	public List<MedicoDTO> listarMedicos() {
@@ -174,7 +175,9 @@ public class AdministradorController {
 
 		return stats;
 	}
-	// métodos do tipo PUT / PATCH para que o administrador atualize qualquer entidade
+
+	// métodos do tipo PUT / PATCH para que o administrador atualize qualquer
+	// entidade
 	// 🔹 Atualizar um Médico
 	@PutMapping("/medico/{id}")
 	public ResponseEntity<MedicoDTO> atualizarMedico(@PathVariable Integer id, @RequestBody MedicoDTO dto) {
@@ -203,10 +206,10 @@ public class AdministradorController {
 
 	// 🔹 Atualizar um Agendamento
 
-
 	// 🔹 Atualizar um Histórico de Consulta
 	@PutMapping("/consulta-historico/{id}")
-	public ResponseEntity<ConsultaHistoricoDTO> atualizarConsultaHistorico(@PathVariable Integer id, @RequestBody ConsultaHistoricoDTO dto) {
+	public ResponseEntity<ConsultaHistoricoDTO> atualizarConsultaHistorico(@PathVariable Integer id,
+			@RequestBody ConsultaHistoricoDTO dto) {
 		return consultaHistoricoRepository.findById(id)
 				.map(consulta -> {
 					consulta.setEspecialidade(dto.getEspecialidade());
@@ -220,7 +223,8 @@ public class AdministradorController {
 
 	// 🔹 Atualizar Dias de Atendimento
 	@PutMapping("/dias-atendimento/{id}")
-	public ResponseEntity<DiasAtendimentoDTO> atualizarDiasAtendimento(@PathVariable Integer id, @RequestBody DiasAtendimentoDTO dto) {
+	public ResponseEntity<DiasAtendimentoDTO> atualizarDiasAtendimento(@PathVariable Integer id,
+			@RequestBody DiasAtendimentoDTO dto) {
 		return diasAtendimentoRepository.findById(id)
 				.map(dia -> {
 					dia.setDiaSemana(dto.getDiaSemana());

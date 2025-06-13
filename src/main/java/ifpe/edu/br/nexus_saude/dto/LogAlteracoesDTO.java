@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,23 +16,22 @@ import lombok.Setter;
 @Builder
 
 public class LogAlteracoesDTO {
-	private Integer logId;
+    private Integer logId;
     private String entidade;
     private String registroId;
     private String usuarioResponsavel;
     private LocalDateTime dataAlteracao;
     private String alteracao;
-    
+
     public static LogAlteracoesDTO fromEntity(LogAlteracoes log) {
         return LogAlteracoesDTO.builder()
                 .logId(log.getLogId())
                 .entidade(log.getEntidade())
                 .registroId(log.getRegistroId())
                 .usuarioResponsavel(log.getUsuarioResponsavel())
-                .dataAlteracao(log.getDataAlteracao()) // Updated type
+                .dataAlteracao(log.getDataAlteracao())
                 .alteracao(log.getAlteracao())
                 .build();
     }
-
 
 }
