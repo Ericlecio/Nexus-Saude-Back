@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/paciente")
 public class PacienteController {
 
-
 	@Autowired private PacienteRepository pacienteRepository; // Nome original era 'repository'
 	@Autowired private UsuarioRepository usuarioRepository;
 	@Autowired private PapelRepository papelRepository;
@@ -194,63 +193,5 @@ public class PacienteController {
 	}
 
 
-	// Método para inserir um novo paciente
-	@PostMapping("/inserir")
-	public ResponseEntity<PacienteDTO> postPaciente(@RequestBody Paciente paciente) {
-		paciente.setEmail(paciente.getEmail().toLowerCase());
-
-		if (paciente.getSenha() != null) {
-			paciente.setSenha(passwordEncoder.encode(paciente.getSenha()));
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-
-		}
-
-		Paciente savedPaciente = repository.save(paciente);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
-	}
-
-	// Método para redefinir a senha do paciente
-	@PutMapping("/redefinir-senha/{pacienteId}")
-	public ResponseEntity<String> redefinirSenha(@PathVariable Integer pacienteId,
-			@RequestBody RedefinirSenhaRequest request) {
-		Paciente paciente = repository.findById(pacienteId).orElse(null);
-		if (paciente == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente não encontrado.");
-		}
-
-		boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(), paciente.getSenha());
-		if (!senhaValida) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha antiga incorreta.");
-		}
-
-		String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
-		paciente.setSenha(novaSenhaCriptografada);
-		repository.save(paciente);
-
-		return ResponseEntity.ok("Senha alterada com sucesso.");
-	}
-
-	// Classe para receber a senha antiga e nova no request
-	public static class RedefinirSenhaRequest {
-		private String senhaAntiga;
-		private String novaSenha;
-
-		public String getSenhaAntiga() {
-			return senhaAntiga;
-		}
-
-		public void setSenhaAntiga(String senhaAntiga) {
-			this.senhaAntiga = senhaAntiga;
-		}
-
-		public String getNovaSenha() {
-			return novaSenha;
-		}
-
-		public void setNovaSenha(String novaSenha) {
-			this.novaSenha = novaSenha;
-		}
-	}
 
 }
