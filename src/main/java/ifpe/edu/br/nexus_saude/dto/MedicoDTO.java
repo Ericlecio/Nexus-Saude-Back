@@ -32,7 +32,6 @@ public class MedicoDTO {
     private LocalDateTime updatedAt;
     private Long usuarioId; // Opcional: se você quiser expor o ID do usuário associado
 
-y
     // Se DiasAtendimento também tiver um DTO, use-o aqui.
     // Por enquanto, mantendo a entidade, mas idealmente seria List<DiasAtendimentoDTO>
     private List<DiasAtendimentoDTO> diasAtendimento;
