@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class PacienteDTO {
-	private Integer id; // Mantido como 'id' para consistência com o DTO, mas refere-se a pacienteId na entidade
-
     private Integer id;
     private String nomeCompleto;
     private String email; // Virá do Usuario associado
