@@ -193,6 +193,11 @@ public class PacienteController {
 		public void setNovaSenha(String novaSenha) { this.novaSenha = novaSenha; }
 	}
 
-
+	
+	@GetMapping("/debug/my-roles")
+	public Object getMyRoles(Authentication authentication) {
+	    // This will return the roles of the currently logged-in user.
+	    return authentication.getAuthorities();
+	}
 
 }

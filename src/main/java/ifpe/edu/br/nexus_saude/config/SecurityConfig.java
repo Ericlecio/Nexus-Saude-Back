@@ -53,7 +53,7 @@ public class SecurityConfig {
 				// Endpoints de Paciente
 				.requestMatchers("/paciente/listar", "/paciente/{id}").hasAnyRole("PACIENTE", "ADMIN") // Paciente vê seus dados, Admin também
 				.requestMatchers(HttpMethod.PUT, "/paciente/update/{id}").hasAnyRole("PACIENTE", "ADMIN")
-				.requestMatchers(HttpMethod.PUT, "/paciente/redefinir-senha/{id}").hasRole("PACIENTE") // Só o próprio paciente
+				.requestMatchers(HttpMethod.PUT, "/paciente/redefinir-senha/{id}").hasAnyRole("PACIENTE", "ADMIN") // Só o próprio paciente
 
 
 				// Endpoints Compartilhados (Agendamentos, Consultas, etc.) - Ajuste fino aqui!
