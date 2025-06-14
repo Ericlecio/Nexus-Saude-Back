@@ -159,4 +159,54 @@ public class MedicoController {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
+	
+	@PutMapping("/redefinir-senha/{medicoId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
+    public ResponseEntity<String> redefinirSenha(@PathVariable Integer medicoId,
+                                                 @Valid @RequestBody RedefinirSenhaRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        Medico medico = medicoRepository.findById(medicoId).orElse(null);
+        if (medico == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Médico não encontrado.");
+        }
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        
+        // If the user is not an admin, they must be the doctor themselves.
+        if (!isAdmin && !medico.getUsuario().getEmail().equals(currentPrincipalName)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+        }
+        
+        // If the user is the doctor, validate their old password.
+        if (!isAdmin) {
+            if (request.getSenhaAntiga() == null || request.getSenhaAntiga().isEmpty()) {
+                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha antiga é obrigatória.");
+            }
+            boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(), medico.getUsuario().getPassword());
+            if (!senhaValida) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha antiga incorreta.");
+            }
+        }
+
+        String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
+        medico.getUsuario().setSenha(novaSenhaCriptografada);
+        medicoRepository.save(medico);
+
+        return ResponseEntity.ok("Senha alterada com sucesso.");
+    }
+
+   
+    public static class RedefinirSenhaRequest {
+        private String senhaAntiga;
+        private String novaSenha;
+
+      
+        public String getSenhaAntiga() { return senhaAntiga; }
+        public void setSenhaAntiga(String senhaAntiga) { this.senhaAntiga = senhaAntiga; }
+        public String getNovaSenha() { return novaSenha; }
+        public void setNovaSenha(String novaSenha) { this.novaSenha = novaSenha; }
+    }
 }

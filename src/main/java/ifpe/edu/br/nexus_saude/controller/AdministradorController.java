@@ -287,5 +287,37 @@ public class AdministradorController {
 				})
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
+	
+	@PutMapping("/redefinir-senha/{adminId}")
+    @PreAuthorize("hasRole('ADMIN')") // Only an Admin can change an Admin's password
+    public ResponseEntity<String> redefinirSenha(@PathVariable Integer adminId,
+                                                 @Valid @RequestBody RedefinirSenhaRequest request) {
+
+        Administrador admin = administradorRepository.findById(adminId).orElse(null);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Administrador não encontrado.");
+        }
+
+        // Admins do not need to provide an old password
+        String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
+        admin.getUsuario().setSenha(novaSenhaCriptografada);
+        administradorRepository.save(admin);
+
+        return ResponseEntity.ok("Senha do administrador alterada com sucesso.");
+    }
+
+    // Add this inner class to AdministradorController as well
+    public static class RedefinirSenhaRequest {
+        // For an admin changing another admin's password, we might not need the old password.
+        // But for consistency, we can keep the same structure.
+        private String senhaAntiga;
+        private String novaSenha;
+
+        // Getters and Setters
+        public String getSenhaAntiga() { return senhaAntiga; }
+        public void setSenhaAntiga(String senhaAntiga) { this.senhaAntiga = senhaAntiga; }
+        public String getNovaSenha() { return novaSenha; }
+        public void setNovaSenha(String novaSenha) { this.novaSenha = novaSenha; }
+    }
 
 }
