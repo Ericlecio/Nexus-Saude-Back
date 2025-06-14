@@ -52,7 +52,6 @@ public class AgendamentoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	// NOVO: listar agendamentos futuros para um médico
 	@GetMapping("/medico/{medicoId}")
 	public List<AgendamentoDTO> listarPorMedico(@PathVariable Integer medicoId) {
 		return agendamentoRepository.findByMedicoIdAndDataAfter(medicoId, LocalDateTime.now())
@@ -65,7 +64,7 @@ public class AgendamentoController {
 	public ResponseEntity<?> inserir(@RequestBody AgendamentoDTO dto) {
 		Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
 		Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId());
-		Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(1); // sempre 'Agendado'
+		Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(1);
 
 		if (paciente.isEmpty() || medico.isEmpty() || situacao.isEmpty()) {
 			return ResponseEntity.badRequest().body("Paciente, Médico ou Situação inválidos.");

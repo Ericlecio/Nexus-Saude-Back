@@ -17,7 +17,7 @@ import lombok.Setter;
 public class AgendamentoDTO {
     private Integer agendamentoId;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // Para desserialização correta do JSON
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime data;
 
     private String especialidade;
@@ -35,7 +35,7 @@ public class AgendamentoDTO {
         this.especialidade = agendamento.getEspecialidade();
         this.local = agendamento.getLocal();
         this.medicoId = agendamento.getMedico().getId();
-        this.pacienteId = agendamento.getPaciente().getPacienteId(); // Corrigido para .getId()
+        this.pacienteId = agendamento.getPaciente().getPacienteId();
         this.situacaoId = agendamento.getSituacao().getSituacaoId();
         this.telefoneConsultorio = agendamento.getTelefoneConsultorio();
         this.valorConsulta = agendamento.getValorConsulta();

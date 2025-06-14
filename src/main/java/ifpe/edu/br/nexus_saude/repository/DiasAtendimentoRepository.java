@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface DiasAtendimentoRepository extends JpaRepository<DiasAtendimento, Integer> {
-    // Método para buscar todos os dias de atendimento de um médico específico
     List<DiasAtendimento> findByMedicoId(Integer medicoId);
 
 }

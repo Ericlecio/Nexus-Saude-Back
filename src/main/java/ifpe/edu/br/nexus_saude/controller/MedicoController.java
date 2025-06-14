@@ -2,7 +2,7 @@ package ifpe.edu.br.nexus_saude.controller;
 
 import ifpe.edu.br.nexus_saude.dto.MedicoDTO;
 import ifpe.edu.br.nexus_saude.dto.RegistroMedicoRequestDTO;
-// import ifpe.edu.br.nexus_saude.model.DiasAtendimento; // Não usado diretamente neste trecho
+import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import ifpe.edu.br.nexus_saude.model.Papel;
 import ifpe.edu.br.nexus_saude.model.Usuario;
@@ -12,7 +12,7 @@ import ifpe.edu.br.nexus_saude.repository.PapelRepository;
 import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.Authentication; // <-- IMPORT CORRIGIDO
+import org.springframework.security.core.Authentication;
 import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
 
@@ -28,25 +28,38 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/medico")
 public class MedicoController {
 
-	@Autowired private MedicoRepository medicoRepository;
-	@Autowired private UsuarioRepository usuarioRepository;
-	@Autowired private PapelRepository papelRepository;
-	@Autowired private PasswordEncoder passwordEncoder;
-	@Autowired private DiasAtendimentoRepository diasAtendimentoRepository;
+	@Autowired
+	private MedicoRepository medicoRepository;
+	@Autowired
+	private UsuarioRepository usuarioRepository;
+	@Autowired
+	private PapelRepository papelRepository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private DiasAtendimentoRepository diasAtendimentoRepository;
 
 	@PostMapping("/registrar")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("permitAll()")
 	public ResponseEntity<?> registrarMedico(@Valid @RequestBody RegistroMedicoRequestDTO requestDTO) {
+		return processarCadastroMedico(requestDTO, false);
+	}
+
+	@PostMapping("/admin-criar")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> criarMedicoComoAdmin(@Valid @RequestBody RegistroMedicoRequestDTO requestDTO) {
+		return processarCadastroMedico(requestDTO, true);
+	}
+
+	private ResponseEntity<?> processarCadastroMedico(RegistroMedicoRequestDTO requestDTO, boolean isAdmin) {
 		if (usuarioRepository.existsByEmail(requestDTO.getEmail())) {
 			return ResponseEntity.badRequest().body("Erro: Email já está em uso!");
 		}
-		// Lembre-se de adicionar existsByCrm e existsByCpf ao MedicoRepository
 		if (medicoRepository.existsByCrm(requestDTO.getCrm())) {
 			return ResponseEntity.badRequest().body("Erro: CRM já está em uso!");
 		}
@@ -66,13 +79,11 @@ public class MedicoController {
 		medico.setEspecialidade(requestDTO.getEspecialidade());
 		medico.setCpf(requestDTO.getCpf());
 		medico.setSexo(requestDTO.getSexo());
-		// Configure outros campos do medico a partir do DTO (dataNascimento, telefoneConsultorio, etc.)
-		// Ex: medico.setDataNascimento(requestDTO.getDataNascimento());
-		// medico.setTelefoneConsultorio(requestDTO.getTelefoneConsultorio());
-		// medico.setTempoConsulta(requestDTO.getTempoConsulta());
-		// medico.setUf(requestDTO.getUf());
-		// medico.setValorConsulta(requestDTO.getValorConsulta());
-
+		medico.setDataNascimento(requestDTO.getDataNascimento());
+		medico.setTelefoneConsultorio(requestDTO.getTelefoneConsultorio());
+		medico.setTempoConsulta(requestDTO.getTempoConsulta());
+		medico.setUf(requestDTO.getUf());
+		medico.setValorConsulta(requestDTO.getValorConsulta());
 
 		Medico savedMedico = medicoRepository.save(medico);
 		return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
@@ -97,7 +108,8 @@ public class MedicoController {
 				.map(medico -> {
 					boolean isAdmin = authentication.getAuthorities().stream()
 							.anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN"));
-					if (!isAdmin && (medico.getUsuario() == null || !medico.getUsuario().getEmail().equals(currentPrincipalName))) {
+					if (!isAdmin && (medico.getUsuario() == null
+							|| !medico.getUsuario().getEmail().equals(currentPrincipalName))) {
 						return ResponseEntity.status(HttpStatus.FORBIDDEN).<MedicoDTO>build();
 					}
 					return ResponseEntity.ok(new MedicoDTO(medico));
@@ -105,10 +117,10 @@ public class MedicoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-
 	@PutMapping("/update/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
-	public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id, @Valid @RequestBody RegistroMedicoRequestDTO medicoAtualizadoDTO) {
+	public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id,
+			@Valid @RequestBody RegistroMedicoRequestDTO medicoAtualizadoDTO) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
 
@@ -116,12 +128,14 @@ public class MedicoController {
 				.map(medico -> {
 					boolean isAdmin = authentication.getAuthorities().stream()
 							.anyMatch(ga -> ga.getAuthority().equals("ROLE_ADMIN"));
-					if (!isAdmin && (medico.getUsuario() == null || !medico.getUsuario().getEmail().equals(currentPrincipalName))) {
+					if (!isAdmin && (medico.getUsuario() == null
+							|| !medico.getUsuario().getEmail().equals(currentPrincipalName))) {
 						return ResponseEntity.status(HttpStatus.FORBIDDEN).<MedicoDTO>build();
 					}
 
 					Usuario usuario = medico.getUsuario();
-					if (medicoAtualizadoDTO.getEmail() != null && !medicoAtualizadoDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
+					if (medicoAtualizadoDTO.getEmail() != null
+							&& !medicoAtualizadoDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
 						if (usuarioRepository.existsByEmail(medicoAtualizadoDTO.getEmail())) {
 							throw new RuntimeException("Email já em uso.");
 						}
@@ -133,21 +147,18 @@ public class MedicoController {
 
 					medico.setNome(medicoAtualizadoDTO.getNome());
 					medico.setEspecialidade(medicoAtualizadoDTO.getEspecialidade());
-					// Atualize outros campos conforme necessário, por exemplo:
-					// medico.setSexo(medicoAtualizadoDTO.getSexo());
-					// medico.setDataNascimento(medicoAtualizadoDTO.getDataNascimento());
-					// medico.setTelefoneConsultorio(medicoAtualizadoDTO.getTelefoneConsultorio());
-					// medico.setTempoConsulta(medicoAtualizadoDTO.getTempoConsulta());
-					// medico.setUf(medicoAtualizadoDTO.getUf());
-					// medico.setValorConsulta(medicoAtualizadoDTO.getValorConsulta());
-					// CRM e CPF geralmente não são atualizados ou requerem lógica de negócio específica.
+					medico.setSexo(medicoAtualizadoDTO.getSexo());
+					medico.setDataNascimento(medicoAtualizadoDTO.getDataNascimento());
+					medico.setTelefoneConsultorio(medicoAtualizadoDTO.getTelefoneConsultorio());
+					medico.setTempoConsulta(medicoAtualizadoDTO.getTempoConsulta());
+					medico.setUf(medicoAtualizadoDTO.getUf());
+					medico.setValorConsulta(medicoAtualizadoDTO.getValorConsulta());
 
 					Medico updated = medicoRepository.save(medico);
 					return ResponseEntity.ok(new MedicoDTO(updated));
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
-
 
 	@DeleteMapping("/deletar/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
@@ -159,54 +170,61 @@ public class MedicoController {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
-	
+
 	@PutMapping("/redefinir-senha/{medicoId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
-    public ResponseEntity<String> redefinirSenha(@PathVariable Integer medicoId,
-                                                 @Valid @RequestBody RedefinirSenhaRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalName = authentication.getName();
+	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
+	public ResponseEntity<String> redefinirSenha(@PathVariable Integer medicoId,
+			@Valid @RequestBody RedefinirSenhaRequest request) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentPrincipalName = authentication.getName();
 
-        Medico medico = medicoRepository.findById(medicoId).orElse(null);
-        if (medico == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Médico não encontrado.");
-        }
+		Medico medico = medicoRepository.findById(medicoId).orElse(null);
+		if (medico == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Médico não encontrado.");
+		}
 
-        boolean isAdmin = authentication.getAuthorities().stream()
-                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        
-        // If the user is not an admin, they must be the doctor themselves.
-        if (!isAdmin && !medico.getUsuario().getEmail().equals(currentPrincipalName)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
-        }
-        
-        // If the user is the doctor, validate their old password.
-        if (!isAdmin) {
-            if (request.getSenhaAntiga() == null || request.getSenhaAntiga().isEmpty()) {
-                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha antiga é obrigatória.");
-            }
-            boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(), medico.getUsuario().getPassword());
-            if (!senhaValida) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha antiga incorreta.");
-            }
-        }
+		boolean isAdmin = authentication.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
-        String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
-        medico.getUsuario().setSenha(novaSenhaCriptografada);
-        medicoRepository.save(medico);
+		if (!isAdmin && !medico.getUsuario().getEmail().equals(currentPrincipalName)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+		}
 
-        return ResponseEntity.ok("Senha alterada com sucesso.");
-    }
+		if (!isAdmin) {
+			if (request.getSenhaAntiga() == null || request.getSenhaAntiga().isEmpty()) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha antiga é obrigatória.");
+			}
+			boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(), medico.getUsuario().getPassword());
+			if (!senhaValida) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha antiga incorreta.");
+			}
+		}
 
-   
-    public static class RedefinirSenhaRequest {
-        private String senhaAntiga;
-        private String novaSenha;
+		String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
+		medico.getUsuario().setSenha(novaSenhaCriptografada);
+		medicoRepository.save(medico);
 
-      
-        public String getSenhaAntiga() { return senhaAntiga; }
-        public void setSenhaAntiga(String senhaAntiga) { this.senhaAntiga = senhaAntiga; }
-        public String getNovaSenha() { return novaSenha; }
-        public void setNovaSenha(String novaSenha) { this.novaSenha = novaSenha; }
-    }
+		return ResponseEntity.ok("Senha alterada com sucesso.");
+	}
+
+	public static class RedefinirSenhaRequest {
+		private String senhaAntiga;
+		private String novaSenha;
+
+		public String getSenhaAntiga() {
+			return senhaAntiga;
+		}
+
+		public void setSenhaAntiga(String senhaAntiga) {
+			this.senhaAntiga = senhaAntiga;
+		}
+
+		public String getNovaSenha() {
+			return novaSenha;
+		}
+
+		public void setNovaSenha(String novaSenha) {
+			this.novaSenha = novaSenha;
+		}
+	}
 }

@@ -13,20 +13,19 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConsultaDTO {
-	private Integer id;
+    private Integer id;
     private Integer pacienteId;
     private Integer medicoId;
     private LocalDateTime data;
     private String especialidade;
     private String local;
-    private Integer situacaoId; // ID da situação do agendamento
+    private Integer situacaoId;
 
-    // Construtor que converte de Consulta para ConsultaDTO
     public ConsultaDTO(Consulta consulta) {
         this.id = consulta.getConsultaId();
-        this.pacienteId = consulta.getPaciente().getPacienteId(); // PacienteID agora é Integer
-        this.medicoId = consulta.getMedico().getId(); // MedicoID agora é Integer
-        this.data = consulta.getData(); // Se 'data' no modelo for LocalDateTime, converta para String
+        this.pacienteId = consulta.getPaciente().getPacienteId();
+        this.medicoId = consulta.getMedico().getId();
+        this.data = consulta.getData();
         this.especialidade = consulta.getEspecialidade();
         this.local = consulta.getLocal();
         this.situacaoId = consulta.getSituacao().getSituacaoId();
@@ -41,8 +40,8 @@ public class ConsultaDTO {
                 .especialidade(this.especialidade)
                 .local(this.local)
                 .situacao(situacao)
-                .createdAt(LocalDateTime.now()) // 🔹 Automatically set createdAt
-                .updatedAt(LocalDateTime.now()) // 🔹 Set updatedAt too
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 

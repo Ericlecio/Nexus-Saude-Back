@@ -1,26 +1,48 @@
 package ifpe.edu.br.nexus_saude.dto;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class RegistroMedicoRequestDTO extends RegistroUsuarioRequestDTO {
-	@NotBlank(message = "O nome do médico é obrigatório.")
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Data
+public class RegistroMedicoRequestDTO {
+
+    @NotBlank
     private String nome;
 
-    @NotBlank(message = "O CRM é obrigatório.")
-    private String crm;
+    @NotBlank
+    private String email;
 
-    @NotBlank(message = "A especialidade é obrigatória.")
+    @NotBlank
+    private String senha;
+
+    @NotBlank
     private String especialidade;
 
-    @NotBlank(message = "O CPF é obrigatório.")
+    @NotBlank
+    private String crm;
+
+    @NotBlank
     private String cpf;
 
-    @NotBlank(message = "O sexo é obrigatório.")
-    private String sexo; // "M" ou "F" por exemplo
+    @NotBlank
+    private String sexo;
 
-    // Adicione outros campos do Medico que são preenchidos no registro
-    // Ex: private LocalDate dataNascimento;
+    @NotBlank
+    private String telefoneConsultorio;
+
+    @NotNull
+    private Integer tempoConsulta;
+
+    @NotBlank
+    private String uf;
+
+    @NotNull
+    private BigDecimal valorConsulta;
+
+    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dataNascimento;
 }

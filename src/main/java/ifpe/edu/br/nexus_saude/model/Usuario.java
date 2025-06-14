@@ -34,7 +34,7 @@ public class Usuario implements UserDetails {
 	private Long id;
 
 	@Column(unique = true, nullable = false, length = 100)
-	private String email; // Usaremos email como username
+	private String email;
 
 	@Column(nullable = false, length = 100)
 	private String senha;
@@ -42,12 +42,8 @@ public class Usuario implements UserDetails {
 	@Column(nullable = false)
 	private boolean ativo = true;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(
-			name = "usuarios_papeis",
-			joinColumns = @JoinColumn(name = "usuario_id"),
-			inverseJoinColumns = @JoinColumn(name = "papel_id")
-			)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinTable(name = "usuarios_papeis", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "papel_id"))
 	private Set<Papel> papeis = new HashSet<>();
 
 	public Usuario(String email, String senha) {
@@ -55,7 +51,6 @@ public class Usuario implements UserDetails {
 		this.senha = senha;
 	}
 
-	// Implementação UserDetails
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return papeis.stream()

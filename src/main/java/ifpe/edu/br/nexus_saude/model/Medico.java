@@ -20,16 +20,13 @@ public class Medico {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
     private Usuario usuario;
-    
+
     @Column(length = 100, nullable = false)
     private String nome;
-    
-    // email e senha estão na classe usuario
-  
 
     @Column(length = 20, nullable = false, unique = true)
     private String crm;
@@ -62,8 +59,6 @@ public class Medico {
 
     private LocalDateTime updatedAt;
 
-    // Relacionamento com a entidade DiasAtendimento
-
     @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<DiasAtendimento> diasAtendimento;
@@ -71,7 +66,7 @@ public class Medico {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.dataCadastro = LocalDateTime.now(); // dataCadastro já existe e é setado aqui
+        this.dataCadastro = LocalDateTime.now();
     }
 
     @PreUpdate

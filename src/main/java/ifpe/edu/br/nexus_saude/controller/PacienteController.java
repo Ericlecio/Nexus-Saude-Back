@@ -28,18 +28,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/paciente")
 public class PacienteController {
 
-	@Autowired private PacienteRepository pacienteRepository; // Nome original era 'repository'
-	@Autowired private UsuarioRepository usuarioRepository;
-	@Autowired private PapelRepository papelRepository;
-	@Autowired private PasswordEncoder passwordEncoder; // Interface em vez da implementação direta
+	@Autowired
+	private PacienteRepository pacienteRepository;
+	@Autowired
+	private UsuarioRepository usuarioRepository;
+	@Autowired
+	private PapelRepository papelRepository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@PostMapping("/registrar")
-	@PreAuthorize("permitAll()") // Permitir que qualquer um se registre como paciente
+	@PreAuthorize("permitAll()")
 	public ResponseEntity<?> registrarPaciente(@Valid @RequestBody RegistroPacienteRequestDTO requestDTO) {
 		if (usuarioRepository.existsByEmail(requestDTO.getEmail())) {
 			return ResponseEntity.badRequest().body("Erro: Email já está em uso!");
 		}
-		if (pacienteRepository.existsByCpf(requestDTO.getCpf())) { // Adicionar ao PacienteRepository
+		if (pacienteRepository.existsByCpf(requestDTO.getCpf())) {
 			return ResponseEntity.badRequest().body("Erro: CPF já está em uso!");
 		}
 
@@ -57,7 +61,7 @@ public class PacienteController {
 		paciente.setPlanoSaude(requestDTO.getPlanoSaude());
 
 		Paciente savedPaciente = pacienteRepository.save(paciente);
-		
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
 	}
 
@@ -66,15 +70,15 @@ public class PacienteController {
 	public List<PacienteDTO> getPacientes() {
 		return pacienteRepository.findAll()
 				.stream()
-				.map(PacienteDTO::new) // PacienteDTO precisa ser ajustado para pegar email do Usuario
+				.map(PacienteDTO::new)
 				.collect(Collectors.toList());
 	}
 
 	@GetMapping("/{pacienteId}")
-	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')") // Admin, o próprio paciente ou médico podem ver
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<PacienteDTO> getPaciente(@PathVariable Integer pacienteId) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String currentPrincipalName = authentication.getName(); // email
+		String currentPrincipalName = authentication.getName();
 
 		Optional<Paciente> pacienteOpt = pacienteRepository.findById(pacienteId);
 		if (pacienteOpt.isEmpty()) {
@@ -83,9 +87,8 @@ public class PacienteController {
 		Paciente paciente = pacienteOpt.get();
 
 		boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-		boolean isMedico = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MEDICO"));
-		// TODO: Médicos só podem ver pacientes que eles atendem? Lógica mais complexa aqui.
-		// Por enquanto, médico pode ver qualquer paciente se tiver o papel.
+		boolean isMedico = authentication.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals("ROLE_MEDICO"));
 
 		if (isAdmin || isMedico || paciente.getUsuario().getEmail().equals(currentPrincipalName)) {
 			return ResponseEntity.ok(new PacienteDTO(paciente));
@@ -94,9 +97,8 @@ public class PacienteController {
 		}
 	}
 
-
 	@PutMapping("/update/{pacienteId}")
-	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')") // Admin ou o próprio paciente
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
 	public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId,
 			@Valid @RequestBody RegistroPacienteRequestDTO pacienteAtualizadoDTO) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -105,25 +107,26 @@ public class PacienteController {
 		return pacienteRepository.findById(pacienteId)
 
 				.map(paciente -> {
-					boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+					boolean isAdmin = authentication.getAuthorities().stream()
+							.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 					if (!isAdmin && !paciente.getUsuario().getEmail().equals(currentPrincipalName)) {
 						return ResponseEntity.status(HttpStatus.FORBIDDEN).<PacienteDTO>build();
 					}
 
 					Usuario usuario = paciente.getUsuario();
-					if (pacienteAtualizadoDTO.getEmail() != null && !pacienteAtualizadoDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
+					if (pacienteAtualizadoDTO.getEmail() != null
+							&& !pacienteAtualizadoDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
 						if (usuarioRepository.existsByEmail(pacienteAtualizadoDTO.getEmail())) {
 							throw new RuntimeException("Email já em uso.");
 						}
 						usuario.setEmail(pacienteAtualizadoDTO.getEmail());
 					}
-					// Não permitir mudança de senha aqui, usar endpoint /redefinir-senha
 
 					paciente.setNomeCompleto(pacienteAtualizadoDTO.getNomeCompleto());
 					paciente.setTelefone(pacienteAtualizadoDTO.getTelefone());
-					// paciente.setCpf(pacienteAtualizadoDTO.getCpf()); // CPF geralmente não muda
-					// paciente.setDataNascimento(pacienteAtualizadoDTO.getDataNascimento());
-					// paciente.setPlanoSaude(pacienteAtualizadoDTO.getPlanoSaude());
+					paciente.setCpf(pacienteAtualizadoDTO.getCpf());
+					paciente.setDataNascimento(pacienteAtualizadoDTO.getDataNascimento());
+					paciente.setPlanoSaude(pacienteAtualizadoDTO.getPlanoSaude());
 
 					Paciente updated = pacienteRepository.save(paciente);
 					return ResponseEntity.ok(new PacienteDTO(updated));
@@ -131,9 +134,8 @@ public class PacienteController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-
 	@DeleteMapping("/deletar/{pacienteId}")
-	@PreAuthorize("hasRole('ADMIN')") // Apenas Admin pode deletar pacientes
+	@PreAuthorize("hasRole('ADMIN')")
 
 	public ResponseEntity<Object> deletePaciente(@PathVariable Integer pacienteId) {
 		return pacienteRepository.findById(pacienteId)
@@ -145,7 +147,7 @@ public class PacienteController {
 	}
 
 	@PutMapping("/redefinir-senha/{pacienteId}")
-	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')") // Admin ou o próprio paciente
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
 	public ResponseEntity<String> redefinirSenha(@PathVariable Integer pacienteId,
 			@Valid @RequestBody RedefinirSenhaRequest request) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -157,47 +159,52 @@ public class PacienteController {
 		}
 
 		boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-		// Se não for admin, deve ser o próprio paciente tentando mudar sua senha
 		if (!isAdmin && !paciente.getUsuario().getEmail().equals(currentPrincipalName)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
 		}
-		// Se for admin, pode pular a verificação da senha antiga se desejado,
-		// ou exigir a senha do admin, ou simplesmente permitir a troca.
-		// Se for o paciente, verificar a senha antiga.
 		if (!isAdmin) {
 			if (request.getSenhaAntiga() == null || request.getSenhaAntiga().isEmpty()) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha antiga é obrigatória para o paciente.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body("Senha antiga é obrigatória para o paciente.");
 			}
-			boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(), paciente.getUsuario().getPassword());
+			boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(),
+					paciente.getUsuario().getPassword());
 			if (!senhaValida) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha antiga incorreta.");
 			}
 		}
 
-
 		String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
 		paciente.getUsuario().setSenha(novaSenhaCriptografada);
-		pacienteRepository.save(paciente); // Salva Paciente, que cascateia para Usuario
+		pacienteRepository.save(paciente);
 
 		return ResponseEntity.ok("Senha alterada com sucesso.");
 	}
 
-	// Classe interna RedefinirSenhaRequest já existe no seu código
 	public static class RedefinirSenhaRequest {
-		private String senhaAntiga; // Obrigatória se for o próprio paciente, opcional se for admin
+		private String senhaAntiga;
 		private String novaSenha;
 
-		public String getSenhaAntiga() { return senhaAntiga; }
-		public void setSenhaAntiga(String senhaAntiga) { this.senhaAntiga = senhaAntiga; }
-		public String getNovaSenha() { return novaSenha; }
-		public void setNovaSenha(String novaSenha) { this.novaSenha = novaSenha; }
+		public String getSenhaAntiga() {
+			return senhaAntiga;
+		}
+
+		public void setSenhaAntiga(String senhaAntiga) {
+			this.senhaAntiga = senhaAntiga;
+		}
+
+		public String getNovaSenha() {
+			return novaSenha;
+		}
+
+		public void setNovaSenha(String novaSenha) {
+			this.novaSenha = novaSenha;
+		}
 	}
 
-	
 	@GetMapping("/debug/my-roles")
 	public Object getMyRoles(Authentication authentication) {
-	    // This will return the roles of the currently logged-in user.
-	    return authentication.getAuthorities();
+		return authentication.getAuthorities();
 	}
 
 }

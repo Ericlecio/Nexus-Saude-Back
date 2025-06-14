@@ -21,13 +21,13 @@ import ifpe.edu.br.nexus_saude.repository.SituacaoAgendamentoRepository;
 @RestController
 @RequestMapping("/consultas")
 public class ConsultaController {
-	private final ConsultaRepository consultaRepository;
+    private final ConsultaRepository consultaRepository;
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
     private final SituacaoAgendamentoRepository situacaoRepository;
 
-    public ConsultaController(ConsultaRepository consultaRepository, MedicoRepository medicoRepository, 
-                              PacienteRepository pacienteRepository, SituacaoAgendamentoRepository situacaoRepository) {
+    public ConsultaController(ConsultaRepository consultaRepository, MedicoRepository medicoRepository,
+            PacienteRepository pacienteRepository, SituacaoAgendamentoRepository situacaoRepository) {
         this.consultaRepository = consultaRepository;
         this.medicoRepository = medicoRepository;
         this.pacienteRepository = pacienteRepository;
@@ -36,9 +36,9 @@ public class ConsultaController {
 
     @PostMapping
     public ResponseEntity<ConsultaDTO> criarConsulta(@RequestBody ConsultaDTO dto) {
-    	Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
-    	Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId()); 
-    	Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(dto.getSituacaoId()); 
+        Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
+        Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId());
+        Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(dto.getSituacaoId());
 
         if (paciente.isEmpty() || medico.isEmpty() || situacao.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -49,6 +49,4 @@ public class ConsultaController {
 
         return ResponseEntity.ok(new ConsultaDTO(savedConsulta));
     }
-
-
 }

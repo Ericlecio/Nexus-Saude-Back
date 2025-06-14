@@ -20,7 +20,6 @@ public class SituacaoAgendamentoController {
     @Autowired
     private SituacaoAgendamentoRepository situacaoRepository;
 
-    // Listar todas as situações
     @GetMapping("/listar")
     public List<SituacaoAgendamentoDTO> listar() {
         return situacaoRepository.findAll()
@@ -29,7 +28,6 @@ public class SituacaoAgendamentoController {
                 .toList();
     }
 
-    // Buscar situação por id
     @GetMapping("/{id}")
     public ResponseEntity<SituacaoAgendamentoDTO> obterPorId(@PathVariable Integer id) {
         Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(id);
@@ -38,15 +36,8 @@ public class SituacaoAgendamentoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Inserir nova situação
     @PostMapping("/inserir")
-    public ResponseEntity<SituacaoAgendamentoDTO> inserir(@RequestBody SituacaoAgendamentoDTO dto) {
-        SituacaoAgendamento situacao = dto.toEntity();
-        SituacaoAgendamento salvo = situacaoRepository.save(situacao);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SituacaoAgendamentoDTO(salvo));
-    }
 
-    // Atualizar situação
     @PutMapping("/update/{id}")
     public ResponseEntity<SituacaoAgendamentoDTO> atualizar(@PathVariable Integer id,
             @RequestBody SituacaoAgendamentoDTO dto) {
@@ -59,7 +50,6 @@ public class SituacaoAgendamentoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Deletar situação
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         Optional<SituacaoAgendamento> situacao = situacaoRepository.findById(id);

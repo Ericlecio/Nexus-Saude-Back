@@ -16,17 +16,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class ConsultaHistoricoDTO {
-	private Integer id;
+    private Integer id;
     private LocalDateTime data;
     private LocalDateTime dataAtualizacao;
     private String especialidade;
     private String local;
-    private String nomeMedico; // Extracting only the name
-    private String nomePaciente; // Extracting only the name
+    private String nomeMedico;
+    private String nomePaciente;
     private String situacao;
     private String telefoneConsultorio;
     private BigDecimal valorConsulta;
-    
+
     public ConsultaHistoricoDTO(ConsultaHistorico consulta) {
         this.id = consulta.getId();
         this.data = consulta.getData();
@@ -39,7 +39,4 @@ public class ConsultaHistoricoDTO {
         this.telefoneConsultorio = consulta.getTelefoneConsultorio();
         this.valorConsulta = consulta.getValorConsulta();
     }
-
-
-
 }

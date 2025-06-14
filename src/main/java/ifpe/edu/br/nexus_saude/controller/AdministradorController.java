@@ -60,15 +60,14 @@ public class AdministradorController {
 	private final PapelRepository papelRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	// Injeção de outras dependências (MedicoRepository, etc.)
 	private final MedicoRepository medicoRepository;
 	private final PacienteRepository pacienteRepository;
 	private final AgendamentoRepository agendamentoRepository;
 	private final ConsultaHistoricoRepository consultaHistoricoRepository;
 	private final DiasAtendimentoRepository diasAtendimentoRepository;
 
-	@PostMapping("/registrar") // Novo endpoint para registrar admin (pode ser público inicialmente ou protegido)
-	@PreAuthorize("permitAll()") // Exemplo: permitir que qualquer um registre o primeiro admin, depois proteger
+	@PostMapping("/registrar")
+	@PreAuthorize("permitAll()")
 	public ResponseEntity<?> registrarAdmin(@Valid @RequestBody RegistroAdminRequestDTO requestDTO) {
 		if (usuarioRepository.existsByEmail(requestDTO.getEmail())) {
 			return ResponseEntity.badRequest().body("Erro: Email já está em uso!");
@@ -76,70 +75,53 @@ public class AdministradorController {
 
 		Usuario usuario = new Usuario(requestDTO.getEmail(), passwordEncoder.encode(requestDTO.getSenha()));
 		Papel adminPapel = papelRepository.findByNome("ADMIN")
-				.orElseGet(() -> papelRepository.save(new Papel("ADMIN"))); // Cria se não existir
+				.orElseGet(() -> papelRepository.save(new Papel("ADMIN")));
 		usuario.setPapeis(Set.of(adminPapel));
-		// Não precisa salvar o usuário aqui se o cascade estiver configurado em Administrador.usuario
 
 		Administrador admin = new Administrador();
 		admin.setUsuario(usuario);
-		// admin.setNomeCompleto(requestDTO.getNomeCompleto()); // Se tiver este campo no DTO
 
 		Administrador savedAdmin = administradorRepository.save(admin);
-		// Use um DTO de resposta para não expor a senha ou detalhes excessivos
-		return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(savedAdmin.getId(), savedAdmin.getUsuario().getEmail()));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(new AdministradorDTO(savedAdmin.getId(), savedAdmin.getUsuario().getEmail()));
 	}
 
-	// Endpoint antigo de postAdmin precisa ser revisto ou removido se /registrar cobrir o caso
-	// @PostMapping("/admin") // Este endpoint parece redundante com /registrar
-	// @PreAuthorize("hasRole('ADMIN')")
-	// public ResponseEntity<AdministradorDTO> postAdmin(@RequestBody Administrador admin) {
-	//     // A lógica aqui precisa ser adaptada para usar a entidade Usuario
-	//     // e provavelmente deveria usar um DTO de request também.
-	//     // admin.getUsuario().setSenha(passwordEncoder.encode(admin.getUsuario().getSenha()));
-	//     // Administrador savedAdmin = repository.save(admin);
-	//     // return ResponseEntity.status(HttpStatus.CREATED).body(new AdministradorDTO(savedAdmin));
-	//     return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build(); // Exemplo
-	// }
-
-	//Atualizar um administrador
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id, @RequestBody RegistroAdminRequestDTO adminDetailsDTO) {
+	public ResponseEntity<AdministradorDTO> updateAdmin(@PathVariable Integer id,
+			@RequestBody RegistroAdminRequestDTO adminDetailsDTO) {
 		return administradorRepository.findById(id)
 
 				.map(admin -> {
 					Usuario usuario = admin.getUsuario();
-					// Atualizar email apenas se fornecido e diferente, e não existente
-					if (adminDetailsDTO.getEmail() != null && !adminDetailsDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
+					if (adminDetailsDTO.getEmail() != null
+							&& !adminDetailsDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
 						if (usuarioRepository.existsByEmail(adminDetailsDTO.getEmail())) {
-							throw new RuntimeException("Email já em uso por outro usuário."); // Ou retorne BadRequest
+							throw new RuntimeException("Email já em uso por outro usuário.");
 						}
 						usuario.setEmail(adminDetailsDTO.getEmail());
 					}
 					if (adminDetailsDTO.getSenha() != null && !adminDetailsDTO.getSenha().isEmpty()) {
 						usuario.setSenha(passwordEncoder.encode(adminDetailsDTO.getSenha()));
 					}
-					// admin.setNomeCompleto(adminDetailsDTO.getNomeCompleto()); // Se tiver
-					// usuarioRepository.save(usuario); // Salvo em cascata por admin
 					Administrador updatedAdmin = administradorRepository.save(admin);
-					return ResponseEntity.ok(new AdministradorDTO(updatedAdmin.getId(), updatedAdmin.getUsuario().getEmail()));
+					return ResponseEntity
+							.ok(new AdministradorDTO(updatedAdmin.getId(), updatedAdmin.getUsuario().getEmail()));
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
-
 
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> deleteAdmin(@PathVariable Integer id) {
 		return administradorRepository.findById(id)
 				.map(admin -> {
-					administradorRepository.delete(admin); // Cascade deve remover o Usuario associado se orphanRemoval=true
+					administradorRepository.delete(admin);
 					return ResponseEntity.noContent().<Void>build();
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	// métodos GET, listam todos as entidades no sistema
 	@GetMapping("/medicos")
 	public List<MedicoDTO> listarMedicos() {
 		return medicoRepository.findAll().stream().map(MedicoDTO::new).toList();
@@ -176,9 +158,6 @@ public class AdministradorController {
 		return stats;
 	}
 
-	// métodos do tipo PUT / PATCH para que o administrador atualize qualquer
-	// entidade
-	// 🔹 Atualizar um Médico
 	@PutMapping("/medico/{id}")
 	public ResponseEntity<MedicoDTO> atualizarMedico(@PathVariable Integer id, @RequestBody MedicoDTO dto) {
 		return medicoRepository.findById(id)
@@ -191,7 +170,6 @@ public class AdministradorController {
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
-	// 🔹 Atualizar um Paciente
 	@PutMapping("/paciente/{id}")
 	public ResponseEntity<PacienteDTO> atualizarPaciente(@PathVariable Integer id, @RequestBody PacienteDTO dto) {
 		return pacienteRepository.findById(id)
@@ -204,9 +182,6 @@ public class AdministradorController {
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
-	// 🔹 Atualizar um Agendamento
-
-	// 🔹 Atualizar um Histórico de Consulta
 	@PutMapping("/consulta-historico/{id}")
 	public ResponseEntity<ConsultaHistoricoDTO> atualizarConsultaHistorico(@PathVariable Integer id,
 			@RequestBody ConsultaHistoricoDTO dto) {
@@ -221,7 +196,6 @@ public class AdministradorController {
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
-	// 🔹 Atualizar Dias de Atendimento
 	@PutMapping("/dias-atendimento/{id}")
 	public ResponseEntity<DiasAtendimentoDTO> atualizarDiasAtendimento(@PathVariable Integer id,
 			@RequestBody DiasAtendimentoDTO dto) {
@@ -236,7 +210,6 @@ public class AdministradorController {
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
-	// métodos do tipo DELETE
 	@DeleteMapping("/medico/{id}")
 	public ResponseEntity<?> deletarMedico(@PathVariable Integer id) {
 		return medicoRepository.findById(id)
@@ -287,37 +260,43 @@ public class AdministradorController {
 				})
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
-	
+
 	@PutMapping("/redefinir-senha/{adminId}")
-    @PreAuthorize("hasRole('ADMIN')") // Only an Admin can change an Admin's password
-    public ResponseEntity<String> redefinirSenha(@PathVariable Integer adminId,
-                                                 @Valid @RequestBody RedefinirSenhaRequest request) {
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<String> redefinirSenha(@PathVariable Integer adminId,
+			@Valid @RequestBody RedefinirSenhaRequest request) {
 
-        Administrador admin = administradorRepository.findById(adminId).orElse(null);
-        if (admin == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Administrador não encontrado.");
-        }
+		Administrador admin = administradorRepository.findById(adminId).orElse(null);
+		if (admin == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Administrador não encontrado.");
+		}
 
-        // Admins do not need to provide an old password
-        String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
-        admin.getUsuario().setSenha(novaSenhaCriptografada);
-        administradorRepository.save(admin);
+		String novaSenhaCriptografada = passwordEncoder.encode(request.getNovaSenha());
+		admin.getUsuario().setSenha(novaSenhaCriptografada);
+		administradorRepository.save(admin);
 
-        return ResponseEntity.ok("Senha do administrador alterada com sucesso.");
-    }
+		return ResponseEntity.ok("Senha do administrador alterada com sucesso.");
+	}
 
-    // Add this inner class to AdministradorController as well
-    public static class RedefinirSenhaRequest {
-        // For an admin changing another admin's password, we might not need the old password.
-        // But for consistency, we can keep the same structure.
-        private String senhaAntiga;
-        private String novaSenha;
+	public static class RedefinirSenhaRequest {
+		private String senhaAntiga;
+		private String novaSenha;
 
-        // Getters and Setters
-        public String getSenhaAntiga() { return senhaAntiga; }
-        public void setSenhaAntiga(String senhaAntiga) { this.senhaAntiga = senhaAntiga; }
-        public String getNovaSenha() { return novaSenha; }
-        public void setNovaSenha(String novaSenha) { this.novaSenha = novaSenha; }
-    }
+		public String getSenhaAntiga() {
+			return senhaAntiga;
+		}
+
+		public void setSenhaAntiga(String senhaAntiga) {
+			this.senhaAntiga = senhaAntiga;
+		}
+
+		public String getNovaSenha() {
+			return novaSenha;
+		}
+
+		public void setNovaSenha(String novaSenha) {
+			this.novaSenha = novaSenha;
+		}
+	}
 
 }

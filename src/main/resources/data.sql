@@ -6,46 +6,59 @@ INSERT INTO situacao_agendamento (descricao) VALUES ('Finalizado');
 -- Papeis (Roles)
 INSERT INTO papeis (nome) VALUES ('PACIENTE'), ('MEDICO'), ('ADMIN');
 
--- Usuarios para os Pacientes
+-- Usuários para os Pacientes
 INSERT INTO usuarios (email, senha, ativo) VALUES
-('paciente1@example.com', '$2a$10$3Z1J4B5v2a3N6E8C7D0F.eG/n5o8r.d8c.a6B5G4H3I2J1K0L.m', true),
-('paciente2@example.com', '$2a$10$3Z1J4B5v2a3N6E8C7D0F.eG/n5o8r.d8c.a6B5G4H3I2J1K0L.m', true),
-('paciente3@example.com', '$2a$10$3Z1J4B5v2a3N6E8C7D0F.eG/n5o8r.d8c.a6B5G4H3I2J1K0L.m', true);
+('maria.silva@example.com', '$2a$10$HASHFICTICIO1', true),
+('joao.souza@example.com', '$2a$10$HASHFICTICIO1', true),
+('ana.costa@example.com', '$2a$10$HASHFICTICIO1', true),
+('bruno.oliveira@example.com', '$2a$10$HASHFICTICIO1', true),
+('luciana.martins@example.com', '$2a$10$HASHFICTICIO1', true);
 
--- Associar Papel de PACIENTE aos usuarios
--- (Assume user IDs 1, 2, 3 and role ID 1 for PACIENTE)
-INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (1, 1), (2, 1), (3, 1);
+-- Associar Papel de PACIENTE aos usuários
+INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (1, 1), (2, 1), (3, 1), (4, 1), (5, 1);
 
--- Pacientes (referenciando os usuarios)
-INSERT INTO paciente (usuario_id, nome_completo, telefone, cpf, data_nascimento, plano_saude, data_cadastro, created_at, updated_at) VALUES
-(1, 'Paciente Um', '(81)99999-0001', '12345678901', '1980-01-01', 'Plano A', NOW(), NOW(), NOW()),
-(2, 'Paciente Dois', '(81)99999-0002', '12345678902', '1990-02-02', 'Plano B', NOW(), NOW(), NOW()),
-(3, 'Paciente Tres', '(81)99999-0003', '12345678903', '2000-03-03', 'Plano C', NOW(), NOW(), NOW());
+-- Pacientes
+INSERT INTO paciente (
+  usuario_id, nome_completo, telefone, cpf, data_nascimento,
+  plano_saude, data_cadastro, created_at, updated_at
+) VALUES
+(1, 'Maria Silva', '(81)98765-4321', '123.456.789-00', '1985-03-15', 'Unimed', NOW(), NOW(), NOW()),
+(2, 'João Souza', '(81)99876-5432', '234.567.890-11', '1992-08-20', 'Hapvida', NOW(), NOW(), NOW()),
+(3, 'Ana Costa', '(81)99654-3210', '345.678.901-22', '2001-12-05', 'Bradesco Saúde', NOW(), NOW(), NOW()),
+(4, 'Bruno Oliveira', '(81)99555-1234', '456.789.012-33', '1988-04-10', 'Amil', NOW(), NOW(), NOW()),
+(5, 'Luciana Martins', '(81)99444-5678', '567.890.123-44', '1995-07-25', 'SulAmérica', NOW(), NOW(), NOW());
 
-
--- Usuarios para os Médicos
+-- Usuários para os Médicos
 INSERT INTO usuarios (email, senha, ativo) VALUES
-('medico1@example.com', '$2a$10$3Z1J4B5v2a3N6E8C7D0F.eG/n5o8r.d8c.a6B5G4H3I2J1K0L.m', true),
-('medico2@example.com', '$2a$10$3Z1J4B5v2a3N6E8C7D0F.eG/n5o8r.d8c.a6B5G4H3I2J1K0L.m', true),
-('medico3@example.com', '$2a$10$3Z1J4B5v2a3N6E8C7D0F.eG/n5o8r.d8c.a6B5G4H3I2J1K0L.m', true);
+('roberto.lima@example.com', '$2a$10$HASHFICTICIO1', true),
+('fernanda.alves@example.com', '$2a$10$HASHFICTICIO1', true),
+('paulo.medeiros@example.com', '$2a$10$HASHFICTICIO1', true),
+('juliana.ramos@example.com', '$2a$10$HASHFICTICIO1', true),
+('marcelo.teixeira@example.com', '$2a$10$HASHFICTICIO1', true);
 
--- Associar Papel de MEDICO aos usuarios
--- (Assume user IDs 4, 5, 6 and role ID 2 for MEDICO)
-INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (4, 2), (5, 2), (6, 2);
+-- Associar Papel de MEDICO aos usuários
+INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (6, 2), (7, 2), (8, 2), (9, 2), (10, 2);
 
--- Médicos (referenciando os usuarios)
-INSERT INTO medico (usuario_id, nome, crm, especialidade, cpf, sexo, telefone_consultorio, tempo_consulta, uf, valor_consulta, data_nascimento, data_cadastro, created_at, updated_at) VALUES
-(4, 'Dr. Cardiologista', 'CRM10001', 'Cardiologia', '98765432101', 'M', '(81)98888-0001', 30, 'PE', 250.00, '1975-05-05', NOW(), NOW(), NOW()),
-(5, 'Dra. Dermatologista', 'CRM10002', 'Dermatologia', '98765432102', 'F', '(81)98888-0002', 45, 'PE', 300.00, '1980-06-10', NOW(), NOW(), NOW()),
-(6, 'Dr. Pediatra', 'CRM10003', 'Pediatria', '98765432103', 'M', '(81)98888-0003', 20, 'PE', 180.00, '1970-07-15', NOW(), NOW(), NOW());
+-- Médicos
+INSERT INTO medico (
+  usuario_id, nome, crm, especialidade, cpf, sexo, telefone_consultorio,
+  tempo_consulta, uf, valor_consulta, data_nascimento, data_cadastro, created_at, updated_at
+) VALUES
+(6, 'Roberto Lima', 'CRM-12345', 'Cardiologia', '678.901.234-55', 'M', '(81)98700-1111', 30, 'PE', 300.00, '1970-07-10', NOW(), NOW(), NOW()),
+(7, 'Fernanda Alves', 'CRM-23456', 'Dermatologia', '789.012.345-66', 'F', '(81)98700-2222', 40, 'PE', 350.00, '1982-05-22', NOW(), NOW(), NOW()),
+(8, 'Paulo Medeiros', 'CRM-34567', 'Pediatria', '890.123.456-77', 'M', '(81)98700-3333', 20, 'PE', 250.00, '1975-11-30', NOW(), NOW(), NOW()),
+(9, 'Juliana Ramos', 'CRM-45678', 'Ginecologia', '901.234.567-88', 'F', '(81)98700-4444', 30, 'PE', 270.00, '1983-03-18', NOW(), NOW(), NOW()),
+(10, 'Marcelo Teixeira', 'CRM-56789', 'Ortopedia', '012.345.678-99', 'M', '(81)98700-5555', 45, 'PE', 320.00, '1979-09-09', NOW(), NOW(), NOW());
 
-
--- Dias de Atendimento para cada médico
--- (Assume medico IDs are 1, 2, 3)
+-- Dias de Atendimento
 INSERT INTO dias_atendimento (medico_id, dia_semana, horario, created_at, updated_at) VALUES
 (1, 'Segunda', '08:00', NOW(), NOW()), (1, 'Segunda', '12:00', NOW(), NOW()),
 (1, 'Quarta', '13:00', NOW(), NOW()), (1, 'Quarta', '17:00', NOW(), NOW()),
 (2, 'Terça', '09:00', NOW(), NOW()), (2, 'Terça', '13:00', NOW(), NOW()),
 (2, 'Quinta', '14:00', NOW(), NOW()), (2, 'Quinta', '18:00', NOW(), NOW()),
 (3, 'Segunda', '07:30', NOW(), NOW()), (3, 'Segunda', '11:30', NOW(), NOW()),
-(3, 'Sexta', '08:00', NOW(), NOW()), (3, 'Sexta', '12:00', NOW(), NOW());
+(3, 'Sexta', '08:00', NOW(), NOW()), (3, 'Sexta', '12:00', NOW(), NOW()),
+(4, 'Quarta', '10:00', NOW(), NOW()), (4, 'Quarta', '14:00', NOW(), NOW()),
+(4, 'Sexta', '09:30', NOW(), NOW()), (4, 'Sexta', '13:30', NOW(), NOW()),
+(5, 'Terça', '10:30', NOW(), NOW()), (5, 'Terça', '15:00', NOW(), NOW()),
+(5, 'Quinta', '08:30', NOW(), NOW()), (5, 'Quinta', '11:30', NOW(), NOW());

@@ -22,7 +22,7 @@ public class Papel {
     private Integer id;
 
     @Column(unique = true, nullable = false, length = 20)
-    private String nome; // Ex: ADMIN, MEDICO, PACIENTE
+    private String nome;
 
     public Papel(String nome) {
         this.nome = nome;

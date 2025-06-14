@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="admin")
+@Table(name = "admin")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,19 +24,14 @@ public class Administrador {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	// o campo email e senha foram movidos para entidade usuairo
-	//@Column(length = 50, nullable = false)
-	//private String email;
-	//@Column(length  = 100, nullable = false)
-	//private String senha;
 
 	@OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
 	@JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
 	private Usuario usuario;
-	 @Override
-	    public String toString() {
-	        return "Administrador [id=" + id + (usuario != null ? ", email=" + usuario.getEmail() : "") + "]";
-	    }
 
+	@Override
+	public String toString() {
+		return "Administrador [id=" + id + (usuario != null ? ", email=" + usuario.getEmail() : "") + "]";
+	}
 
 }
