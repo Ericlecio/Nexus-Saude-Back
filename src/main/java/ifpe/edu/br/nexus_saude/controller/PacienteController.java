@@ -53,10 +53,11 @@ public class PacienteController {
 		paciente.setNomeCompleto(requestDTO.getNomeCompleto());
 		paciente.setTelefone(requestDTO.getTelefone());
 		paciente.setCpf(requestDTO.getCpf());
-		// Configure outros campos do paciente a partir do DTO (dataNascimento, planoSaude, etc.)
+		paciente.setDataNascimento(requestDTO.getDataNascimento());
+		paciente.setPlanoSaude(requestDTO.getPlanoSaude());
 
 		Paciente savedPaciente = pacienteRepository.save(paciente);
-		// Retornar DTO de resposta
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(new PacienteDTO(savedPaciente));
 	}
 
