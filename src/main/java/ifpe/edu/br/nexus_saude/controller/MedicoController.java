@@ -46,7 +46,6 @@ public class MedicoController {
 	private DiasAtendimentoRepository diasAtendimentoRepository;
 
 	@PostMapping("/registrar")
-	@PreAuthorize("permitAll()")
 	public ResponseEntity<?> registrarMedico(@Valid @RequestBody RegistroMedicoRequestDTO requestDTO) {
 		return processarCadastroMedico(requestDTO, false);
 	}
