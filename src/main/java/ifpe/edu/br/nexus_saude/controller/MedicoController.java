@@ -6,15 +6,15 @@ import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import ifpe.edu.br.nexus_saude.model.Papel;
 import ifpe.edu.br.nexus_saude.model.Usuario;
-// import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
+import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
 import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import ifpe.edu.br.nexus_saude.repository.PapelRepository;
 import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
-// import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
-// import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
+import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
+import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,9 +42,8 @@ public class MedicoController {
 	private PapelRepository papelRepository;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
 	@Autowired
-	// private DiasAtendimentoRepository diasAtendimentoRepository;
+	private DiasAtendimentoRepository diasAtendimentoRepository;
 
 	@PostMapping("/registrar")
 	@PreAuthorize("permitAll()")
@@ -59,51 +58,51 @@ public class MedicoController {
 	}
 
 	private ResponseEntity<?> processarCadastroMedico(RegistroMedicoRequestDTO requestDTO, boolean isAdmin) {
-		if (usuarioRepository.existsByEmail(requestDTO.getEmail())) {
-			return ResponseEntity.badRequest().body("Erro: Email já está em uso!");
-		}
-		if (medicoRepository.existsByCrm(requestDTO.getCrm())) {
-			return ResponseEntity.badRequest().body("Erro: CRM já está em uso!");
-		}
-		if (medicoRepository.existsByCpf(requestDTO.getCpf())) {
-			return ResponseEntity.badRequest().body("Erro: CPF já está em uso!");
-		}
+    if (usuarioRepository.existsByEmail(requestDTO.getEmail())) {
+        return ResponseEntity.badRequest().body("Erro: Email já está em uso!");
+    }
+    if (medicoRepository.existsByCrm(requestDTO.getCrm())) {
+        return ResponseEntity.badRequest().body("Erro: CRM já está em uso!");
+    }
+    if (medicoRepository.existsByCpf(requestDTO.getCpf())) {
+        return ResponseEntity.badRequest().body("Erro: CPF já está em uso!");
+    }
 
-		Usuario usuario = new Usuario(requestDTO.getEmail(), passwordEncoder.encode(requestDTO.getSenha()));
-		Papel medicoPapel = papelRepository.findByNome("MEDICO")
-				.orElseGet(() -> papelRepository.save(new Papel("MEDICO")));
-		usuario.setPapeis(Set.of(medicoPapel));
+    Usuario usuario = new Usuario(requestDTO.getEmail(), passwordEncoder.encode(requestDTO.getSenha()));
+    Papel medicoPapel = papelRepository.findByNome("MEDICO")
+            .orElseGet(() -> papelRepository.save(new Papel("MEDICO")));
+    usuario.setPapeis(Set.of(medicoPapel));
 
-		Medico medico = new Medico();
-		medico.setUsuario(usuario);
-		medico.setNome(requestDTO.getNome());
-		medico.setCrm(requestDTO.getCrm());
-		medico.setEspecialidade(requestDTO.getEspecialidade());
-		medico.setCpf(requestDTO.getCpf());
-		medico.setSexo(requestDTO.getSexo());
-		medico.setDataNascimento(requestDTO.getDataNascimento());
-		medico.setTelefoneConsultorio(requestDTO.getTelefoneConsultorio());
-		medico.setTempoConsulta(requestDTO.getTempoConsulta());
-		medico.setUf(requestDTO.getUf());
-		medico.setValorConsulta(requestDTO.getValorConsulta());
+    Medico medico = new Medico();
+    medico.setUsuario(usuario);
+    medico.setNome(requestDTO.getNome());
+    medico.setCrm(requestDTO.getCrm());
+    medico.setEspecialidade(requestDTO.getEspecialidade());
+    medico.setCpf(requestDTO.getCpf());
+    medico.setSexo(requestDTO.getSexo());
+    medico.setDataNascimento(requestDTO.getDataNascimento());
+    medico.setTelefoneConsultorio(requestDTO.getTelefoneConsultorio());
+    medico.setTempoConsulta(requestDTO.getTempoConsulta());
+    medico.setUf(requestDTO.getUf());
+    medico.setValorConsulta(requestDTO.getValorConsulta());
 
-		// RECEBE OS DIAS DO DTO, CRIA E VINCULA NO MÉDICO
-		if (requestDTO.getDiasAtendimento() != null && !requestDTO.getDiasAtendimento().isEmpty()) {
-			List<DiasAtendimento> dias = requestDTO.getDiasAtendimento().stream().map(dto -> {
-				DiasAtendimento dia = new DiasAtendimento();
-				dia.setMedico(medico); // vincula!
-				dia.setDiaSemana(dto.getDiaSemana());
-				dia.setHorario(dto.getHorario());
-				dia.setCreatedAt(LocalDateTime.now());
-				dia.setUpdatedAt(LocalDateTime.now());
-				return dia;
-			}).collect(Collectors.toList());
-			medico.setDiasAtendimento(dias);
-		}
+    // RECEBE OS DIAS DO DTO, CRIA E VINCULA NO MÉDICO
+    if (requestDTO.getDiasAtendimento() != null && !requestDTO.getDiasAtendimento().isEmpty()) {
+        List<DiasAtendimento> dias = requestDTO.getDiasAtendimento().stream().map(dto -> {
+            DiasAtendimento dia = new DiasAtendimento();
+            dia.setMedico(medico); // vincula!
+            dia.setDiaSemana(dto.getDiaSemana());
+            dia.setHorario(dto.getHorario());
+            dia.setCreatedAt(LocalDateTime.now());
+            dia.setUpdatedAt(LocalDateTime.now());
+            return dia;
+        }).collect(Collectors.toList());
+        medico.setDiasAtendimento(dias);
+    }
 
-		Medico savedMedico = medicoRepository.save(medico);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
-	}
+    Medico savedMedico = medicoRepository.save(medico);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));
+}
 
 	@GetMapping("/listar")
 	@PreAuthorize("hasRole('ADMIN')")

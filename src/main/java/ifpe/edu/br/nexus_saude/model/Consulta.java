@@ -1,5 +1,6 @@
 package ifpe.edu.br.nexus_saude.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -14,6 +15,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "consultas")
@@ -51,5 +53,6 @@ public class Consulta {
 
 	@Column(nullable = false)
 	private LocalDateTime updatedAt;
+
 
 }

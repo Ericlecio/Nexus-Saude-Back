@@ -1,5 +1,8 @@
 package ifpe.edu.br.nexus_saude.dto;
 
-public class RegistroAdminRequestDTO extends RegistroUsuarioRequestDTO {
+import lombok.Getter;
+import lombok.Setter;
 
+public class RegistroAdminRequestDTO extends RegistroUsuarioRequestDTO{
+	
 }
