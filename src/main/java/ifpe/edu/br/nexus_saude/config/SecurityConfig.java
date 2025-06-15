@@ -37,7 +37,7 @@ public class SecurityConfig {
 				})
 				.authorizeHttpRequests(authorize -> authorize
 						// Permitido sem autenticação
-						.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ⬅️ Libera requisições OPTIONS
+						.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
 						.requestMatchers(HttpMethod.POST, "/admin/registrar").permitAll()
 						.requestMatchers(HttpMethod.POST, "/paciente/registrar").permitAll()
