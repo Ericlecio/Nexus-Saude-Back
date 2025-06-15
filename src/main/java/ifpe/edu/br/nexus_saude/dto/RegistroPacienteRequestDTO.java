@@ -1,16 +1,14 @@
 package ifpe.edu.br.nexus_saude.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -28,14 +26,11 @@ public class RegistroPacienteRequestDTO extends RegistroUsuarioRequestDTO {
     @Size(min = 11, max = 14, message = "O CPF deve ter entre 11 e 14 caracteres.")
     private String cpf;
 
-    @NotNull(message = "A data de nascimento é obrigatória.")
-    @Past(message = "A data de nascimento deve ser uma data no passado.")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-
     @Size(max = 50, message = "O plano de saúde deve ter no máximo 50 caracteres.")
     private String planoSaude;
 
-    @NotNull
+    @NotNull(message = "A data de nascimento é obrigatória.")
+    @Past(message = "A data de nascimento deve ser uma data no passado.")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataNascimento;
 }

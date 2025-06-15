@@ -44,6 +44,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.POST, "/medico/registrar").permitAll()
 
 						// Endpoints de Administrador
+						.requestMatchers(HttpMethod.GET, "/admin/dashboard-stats").permitAll()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 
 						// Endpoints de Médico
