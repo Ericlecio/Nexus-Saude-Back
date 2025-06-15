@@ -13,8 +13,8 @@ import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
-import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
-import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
+// import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
+// import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import java.util.Set;
@@ -84,6 +85,20 @@ public class MedicoController {
 		medico.setTempoConsulta(requestDTO.getTempoConsulta());
 		medico.setUf(requestDTO.getUf());
 		medico.setValorConsulta(requestDTO.getValorConsulta());
+
+		// RECEBE OS DIAS DO DTO, CRIA E VINCULA NO MÉDICO
+		if (requestDTO.getDiasAtendimento() != null && !requestDTO.getDiasAtendimento().isEmpty()) {
+			List<DiasAtendimento> dias = requestDTO.getDiasAtendimento().stream().map(dto -> {
+				DiasAtendimento dia = new DiasAtendimento();
+				dia.setMedico(medico); // vincula!
+				dia.setDiaSemana(dto.getDiaSemana());
+				dia.setHorario(dto.getHorario());
+				dia.setCreatedAt(LocalDateTime.now());
+				dia.setUpdatedAt(LocalDateTime.now());
+				return dia;
+			}).collect(Collectors.toList());
+			medico.setDiasAtendimento(dias);
+		}
 
 		Medico savedMedico = medicoRepository.save(medico);
 		return ResponseEntity.status(HttpStatus.CREATED).body(new MedicoDTO(savedMedico));

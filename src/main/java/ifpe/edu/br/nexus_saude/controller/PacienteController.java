@@ -40,6 +40,16 @@ public class PacienteController {
 	@PostMapping("/registrar")
 	@PreAuthorize("permitAll()")
 	public ResponseEntity<?> registrarPaciente(@Valid @RequestBody RegistroPacienteRequestDTO requestDTO) {
+		return processarCadastroPaciente(requestDTO);
+	}
+
+	@PostMapping("/admin-criar")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> criarPacienteComoAdmin(@Valid @RequestBody RegistroPacienteRequestDTO requestDTO) {
+		return processarCadastroPaciente(requestDTO);
+	}
+
+	private ResponseEntity<?> processarCadastroPaciente(RegistroPacienteRequestDTO requestDTO) {
 		if (usuarioRepository.existsByEmail(requestDTO.getEmail())) {
 			return ResponseEntity.badRequest().body("Erro: Email já está em uso!");
 		}
@@ -122,6 +132,11 @@ public class PacienteController {
 						usuario.setEmail(pacienteAtualizadoDTO.getEmail());
 					}
 
+					if (!pacienteAtualizadoDTO.getCpf().equals(paciente.getCpf()) &&
+							pacienteRepository.existsByCpf(pacienteAtualizadoDTO.getCpf())) {
+						throw new RuntimeException("CPF já em uso.");
+					}
+
 					paciente.setNomeCompleto(pacienteAtualizadoDTO.getNomeCompleto());
 					paciente.setTelefone(pacienteAtualizadoDTO.getTelefone());
 					paciente.setCpf(pacienteAtualizadoDTO.getCpf());
@@ -136,7 +151,6 @@ public class PacienteController {
 
 	@DeleteMapping("/deletar/{pacienteId}")
 	@PreAuthorize("hasRole('ADMIN')")
-
 	public ResponseEntity<Object> deletePaciente(@PathVariable Integer pacienteId) {
 		return pacienteRepository.findById(pacienteId)
 				.map(paciente -> {
@@ -162,10 +176,10 @@ public class PacienteController {
 		if (!isAdmin && !paciente.getUsuario().getEmail().equals(currentPrincipalName)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
 		}
+
 		if (!isAdmin) {
 			if (request.getSenhaAntiga() == null || request.getSenhaAntiga().isEmpty()) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body("Senha antiga é obrigatória para o paciente.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha antiga é obrigatória.");
 			}
 			boolean senhaValida = passwordEncoder.matches(request.getSenhaAntiga(),
 					paciente.getUsuario().getPassword());
@@ -206,5 +220,4 @@ public class PacienteController {
 	public Object getMyRoles(Authentication authentication) {
 		return authentication.getAuthorities();
 	}
-
 }
