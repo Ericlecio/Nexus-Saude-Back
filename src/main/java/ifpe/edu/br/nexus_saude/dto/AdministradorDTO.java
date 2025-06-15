@@ -1,7 +1,7 @@
 package ifpe.edu.br.nexus_saude.dto;
 
 import ifpe.edu.br.nexus_saude.model.Administrador;
-import ifpe.edu.br.nexus_saude.model.Usuario;
+// import ifpe.edu.br.nexus_saude.model.Usuario;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

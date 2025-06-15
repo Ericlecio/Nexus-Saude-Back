@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ import ifpe.edu.br.nexus_saude.dto.MedicoDTO;
 import ifpe.edu.br.nexus_saude.dto.PacienteDTO;
 import ifpe.edu.br.nexus_saude.dto.RegistroAdminRequestDTO;
 import ifpe.edu.br.nexus_saude.model.Administrador;
-import ifpe.edu.br.nexus_saude.model.Agendamento;
+// import ifpe.edu.br.nexus_saude.model.Agendamento;
 import ifpe.edu.br.nexus_saude.model.ConsultaHistorico;
 import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;

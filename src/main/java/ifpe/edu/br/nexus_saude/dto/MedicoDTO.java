@@ -1,8 +1,8 @@
 package ifpe.edu.br.nexus_saude.dto;
 
-import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
+// import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
-import ifpe.edu.br.nexus_saude.model.Usuario;
+// import ifpe.edu.br.nexus_saude.model.Usuario;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
