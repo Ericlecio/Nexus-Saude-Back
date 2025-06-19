@@ -146,6 +146,7 @@ public class AdministradorController {
 	public List<DiasAtendimentoDTO> listarDiasAtendimento() {
 		return diasAtendimentoRepository.findAll().stream().map(DiasAtendimentoDTO::new).toList();
 	}
+	
 	@PreAuthorize("permitAll()") 
 	@GetMapping("/dashboard-stats")
 	public Map<String, Integer> getDashboardStats() {
@@ -158,108 +159,7 @@ public class AdministradorController {
 		return stats;
 	}
 
-	@PutMapping("/medico/{id}")
-	public ResponseEntity<MedicoDTO> atualizarMedico(@PathVariable Integer id, @RequestBody MedicoDTO dto) {
-		return medicoRepository.findById(id)
-				.map(medico -> {
-					medico.setNome(dto.getNome());
-					medico.setEspecialidade(dto.getEspecialidade());
-					Medico updatedMedico = medicoRepository.save(medico);
-					return ResponseEntity.ok(new MedicoDTO(updatedMedico));
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
 
-	@PutMapping("/paciente/{id}")
-	public ResponseEntity<PacienteDTO> atualizarPaciente(@PathVariable Integer id, @RequestBody PacienteDTO dto) {
-		return pacienteRepository.findById(id)
-				.map(paciente -> {
-					paciente.setNomeCompleto(dto.getNomeCompleto());
-					paciente.setDataNascimento(dto.getDataNascimento());
-					Paciente updatedPaciente = pacienteRepository.save(paciente);
-					return ResponseEntity.ok(new PacienteDTO(updatedPaciente));
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
-
-	@PutMapping("/consulta-historico/{id}")
-	public ResponseEntity<ConsultaHistoricoDTO> atualizarConsultaHistorico(@PathVariable Integer id,
-			@RequestBody ConsultaHistoricoDTO dto) {
-		return consultaHistoricoRepository.findById(id)
-				.map(consulta -> {
-					consulta.setEspecialidade(dto.getEspecialidade());
-					consulta.setLocal(dto.getLocal());
-					consulta.setDataAtualizacao(LocalDateTime.now());
-					ConsultaHistorico updatedConsulta = consultaHistoricoRepository.save(consulta);
-					return ResponseEntity.ok(new ConsultaHistoricoDTO(updatedConsulta));
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
-
-	@PutMapping("/dias-atendimento/{id}")
-	public ResponseEntity<DiasAtendimentoDTO> atualizarDiasAtendimento(@PathVariable Integer id,
-			@RequestBody DiasAtendimentoDTO dto) {
-		return diasAtendimentoRepository.findById(id)
-				.map(dia -> {
-					dia.setDiaSemana(dto.getDiaSemana());
-					dia.setHorario(dto.getHorario());
-					dia.setUpdatedAt(LocalDateTime.now());
-					DiasAtendimento updatedDia = diasAtendimentoRepository.save(dia);
-					return ResponseEntity.ok(new DiasAtendimentoDTO(updatedDia));
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
-
-	@DeleteMapping("/medico/{id}")
-	public ResponseEntity<?> deletarMedico(@PathVariable Integer id) {
-		return medicoRepository.findById(id)
-				.map(medico -> {
-					medicoRepository.delete(medico);
-					return ResponseEntity.ok("Médico removido pelo administrador!");
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
-
-	@DeleteMapping("/paciente/{id}")
-	public ResponseEntity<?> deletarPaciente(@PathVariable Integer id) {
-
-		return pacienteRepository.findById(id)
-				.map(paciente -> {
-					pacienteRepository.delete(paciente);
-					return ResponseEntity.ok("Paciente removido pelo administrador!");
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
-
-	@DeleteMapping("/agendamento/{id}")
-	public ResponseEntity<?> deletarAgendamento(@PathVariable Integer id) {
-		return agendamentoRepository.findById(id)
-				.map(agendamento -> {
-					agendamentoRepository.delete(agendamento);
-					return ResponseEntity.ok("Agendamento removido pelo administrador!");
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
-
-	@DeleteMapping("/consulta-historico/{id}")
-	public ResponseEntity<?> deletarConsultaHistorico(@PathVariable Integer id) {
-		return consultaHistoricoRepository.findById(id)
-				.map(consulta -> {
-					consultaHistoricoRepository.delete(consulta);
-					return ResponseEntity.ok("Consulta histórica removida pelo administrador!");
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
-
-	@DeleteMapping("/dias-atendimento/{id}")
-	public ResponseEntity<?> deletarDiasAtendimento(@PathVariable Integer id) {
-		return diasAtendimentoRepository.findById(id)
-				.map(dia -> {
-					diasAtendimentoRepository.delete(dia);
-					return ResponseEntity.ok("Dias de atendimento removidos pelo administrador!");
-				})
-				.orElseGet(() -> ResponseEntity.notFound().build());
-	}
 
 	@PutMapping("/redefinir-senha/{adminId}")
 	@PreAuthorize("hasRole('ADMIN')")
