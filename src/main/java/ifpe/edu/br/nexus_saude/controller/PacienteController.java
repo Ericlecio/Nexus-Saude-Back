@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("/paciente")
 public class PacienteController {
 
-
 	@Autowired
 	private PacienteRepository pacienteRepository;
 	@Autowired
@@ -109,8 +108,6 @@ public class PacienteController {
 		}
 	}
 
-	// em src/main/java/ifpe/edu/br/nexus_saude/controller/PacienteController.java
-
 	@PutMapping("/update/{pacienteId}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
 	public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId,
@@ -118,12 +115,6 @@ public class PacienteController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
 
-		// --- ADICIONE ESTES LOGS ---
-		System.out.println("\n--- INICIANDO DEBUG updatePaciente ---");
-		System.out.println("ID do Paciente a ser atualizado: " + pacienteId);
-		System.out.println("Usuário autenticado (do token): " + currentPrincipalName);
-		System.out.println("Autoridades do usuário: " + authentication.getAuthorities());
-		// --- FIM DOS LOGS INICIAIS --
 
 		return pacienteRepository.findById(pacienteId)
 				.map(paciente -> {
@@ -149,7 +140,7 @@ public class PacienteController {
 	}
 
 	@DeleteMapping("/deletar/{pacienteId}")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
 	public ResponseEntity<Object> deletePaciente(@PathVariable Integer pacienteId) {
 		return pacienteRepository.findById(pacienteId)
 				.map(paciente -> {
