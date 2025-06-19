@@ -22,11 +22,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/paciente")
 public class PacienteController {
+
 
 	@Autowired
 	private PacienteRepository pacienteRepository;
@@ -107,6 +109,8 @@ public class PacienteController {
 		}
 	}
 
+	// em src/main/java/ifpe/edu/br/nexus_saude/controller/PacienteController.java
+
 	@PutMapping("/update/{pacienteId}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
 	public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId,
@@ -114,27 +118,21 @@ public class PacienteController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
 
-		return pacienteRepository.findById(pacienteId)
+		// --- ADICIONE ESTES LOGS ---
+		System.out.println("\n--- INICIANDO DEBUG updatePaciente ---");
+		System.out.println("ID do Paciente a ser atualizado: " + pacienteId);
+		System.out.println("Usuário autenticado (do token): " + currentPrincipalName);
+		System.out.println("Autoridades do usuário: " + authentication.getAuthorities());
+		// --- FIM DOS LOGS INICIAIS --
 
+		return pacienteRepository.findById(pacienteId)
 				.map(paciente -> {
 					boolean isAdmin = authentication.getAuthorities().stream()
 							.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
 					if (!isAdmin && !paciente.getUsuario().getEmail().equals(currentPrincipalName)) {
+						
 						return ResponseEntity.status(HttpStatus.FORBIDDEN).<PacienteDTO>build();
-					}
-
-					Usuario usuario = paciente.getUsuario();
-					if (pacienteAtualizadoDTO.getEmail() != null
-							&& !pacienteAtualizadoDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
-						if (usuarioRepository.existsByEmail(pacienteAtualizadoDTO.getEmail())) {
-							throw new RuntimeException("Email já em uso.");
-						}
-						usuario.setEmail(pacienteAtualizadoDTO.getEmail());
-					}
-
-					if (!pacienteAtualizadoDTO.getCpf().equals(paciente.getCpf()) &&
-							pacienteRepository.existsByCpf(pacienteAtualizadoDTO.getCpf())) {
-						throw new RuntimeException("CPF já em uso.");
 					}
 
 					paciente.setNomeCompleto(pacienteAtualizadoDTO.getNomeCompleto());
@@ -145,6 +143,7 @@ public class PacienteController {
 
 					Paciente updated = pacienteRepository.save(paciente);
 					return ResponseEntity.ok(new PacienteDTO(updated));
+
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
@@ -217,6 +216,7 @@ public class PacienteController {
 	}
 
 	@GetMapping("/debug/my-roles")
+	@PreAuthorize("isAuthenticated()")
 	public Object getMyRoles(Authentication authentication) {
 		return authentication.getAuthorities();
 	}
