@@ -5,6 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -59,9 +60,9 @@ public class Medico {
 
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
-    private List<DiasAtendimento> diasAtendimento;
+    private List<DiasAtendimento> diasAtendimento = new ArrayList<>();;
 
     @PrePersist
     protected void onCreate() {

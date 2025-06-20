@@ -13,6 +13,7 @@ import ifpe.edu.br.nexus_saude.repository.SituacaoAgendamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -38,6 +39,7 @@ public class AgendamentoController {
 	private SituacaoAgendamentoRepository situacaoRepository;
 
 	@GetMapping("/listar")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public List<AgendamentoDTO> listar() {
 		return agendamentoRepository.findAll()
 				.stream()
@@ -46,6 +48,7 @@ public class AgendamentoController {
 	}
 
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<AgendamentoDTO> obterPorId(@PathVariable Integer id) {
 		Optional<Agendamento> agendamento = agendamentoRepository.findById(id);
 		return agendamento.map(a -> ResponseEntity.ok(new AgendamentoDTO(a)))
@@ -53,6 +56,7 @@ public class AgendamentoController {
 	}
 
 	@GetMapping("/medico/{medicoId}")
+	@PreAuthorize("hasAnyRole('ADMIN','MEDICO')")
 	public List<AgendamentoDTO> listarPorMedico(@PathVariable Integer medicoId) {
 		return agendamentoRepository.findByMedicoIdAndDataAfter(medicoId, LocalDateTime.now())
 				.stream()
@@ -61,6 +65,7 @@ public class AgendamentoController {
 	}
 
 	@PostMapping("/inserir")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<?> inserir(@RequestBody AgendamentoDTO dto) {
 		Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
 		Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId());
@@ -94,6 +99,7 @@ public class AgendamentoController {
 	}
 
 	@PutMapping("/update/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody AgendamentoDTO dto) {
 		Optional<Agendamento> optAgendamento = agendamentoRepository.findById(id);
 		if (optAgendamento.isEmpty()) {
@@ -132,6 +138,7 @@ public class AgendamentoController {
 	}
 
 	@DeleteMapping("/deletar/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<?> deletar(@PathVariable Integer id) {
 		Optional<Agendamento> agendamento = agendamentoRepository.findById(id);
 		if (agendamento.isEmpty()) {
@@ -142,6 +149,7 @@ public class AgendamentoController {
 	}
 
 	@GetMapping("/listarPorMedico")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<List<AgendamentoDTO>> listarPorMedico(
 			@RequestParam Integer medicoId,
 			@RequestParam(required = false) String situacao) {

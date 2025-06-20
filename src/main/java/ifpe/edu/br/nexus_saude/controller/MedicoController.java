@@ -167,6 +167,29 @@ public class MedicoController {
 					medico.setTempoConsulta(medicoAtualizadoDTO.getTempoConsulta());
 					medico.setUf(medicoAtualizadoDTO.getUf());
 					medico.setValorConsulta(medicoAtualizadoDTO.getValorConsulta());
+					
+					// --- INÍCIO DA CORREÇÃO ---
+					// 1. Limpa a lista de dias de atendimento existente do médico.
+					// A cascata (CascadeType.ALL) na entidade Medico garantirá que eles sejam removidos do banco.
+					if (medico.getDiasAtendimento() != null) {
+						medico.getDiasAtendimento().clear();
+					}
+
+					// 2. Adiciona os novos dias de atendimento que vieram na requisição.
+					if (medicoAtualizadoDTO.getDiasAtendimento() != null && !medicoAtualizadoDTO.getDiasAtendimento().isEmpty()) {
+						List<DiasAtendimento> novosDias = medicoAtualizadoDTO.getDiasAtendimento().stream().map(dto -> {
+							DiasAtendimento dia = new DiasAtendimento();
+							dia.setMedico(medico); // Re-vincula ao médico
+							dia.setDiaSemana(dto.getDiaSemana());
+							dia.setHorario(dto.getHorario());
+							dia.setCreatedAt(LocalDateTime.now());
+							dia.setUpdatedAt(LocalDateTime.now());
+							return dia;
+						}).collect(Collectors.toList());
+						// Adiciona a nova lista à coleção do médico
+						medico.getDiasAtendimento().addAll(novosDias);
+					}
+					// --- FIM DA CORREÇÃO ---
 
 					Medico updated = medicoRepository.save(medico);
 					return ResponseEntity.ok(new MedicoDTO(updated));

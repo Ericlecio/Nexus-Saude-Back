@@ -3,6 +3,7 @@ package ifpe.edu.br.nexus_saude.controller;
 import java.time.LocalDateTime;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ public class LogAlteracoesController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
     public ResponseEntity<LogAlteracoesDTO> criarLog(@RequestBody LogAlteracoesDTO dto) {
         LogAlteracoes log = new LogAlteracoes(
                 null,

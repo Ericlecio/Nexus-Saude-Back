@@ -13,6 +13,7 @@ import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
 import ifpe.edu.br.nexus_saude.repository.SituacaoAgendamentoRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -39,6 +40,7 @@ public class ConsultaHistoricoController {
 	}
 
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')") 
 	public List<ConsultaHistoricoDTO> listarConsultasHistorico() {
 		return consultaHistoricoRepository.findAll()
 				.stream()
@@ -57,13 +59,14 @@ public class ConsultaHistoricoController {
 	}
 
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<ConsultaHistoricoDTO> obterConsultaHistoricoPorId(@PathVariable Integer id) {
 		return consultaHistoricoRepository.findById(id)
 				.map(consulta -> ResponseEntity.ok(new ConsultaHistoricoDTO(
 						consulta.getId(),
 						consulta.getData(),
 						consulta.getDataAtualizacao(),
-						consulta.getEspecialidade(),
+						consulta.getEspecialidade(), 
 						consulta.getLocal(),
 						consulta.getMedico().getNome(),
 						consulta.getPaciente().getNomeCompleto(),
@@ -74,6 +77,7 @@ public class ConsultaHistoricoController {
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<ConsultaHistoricoDTO> criarConsultaHistorico(@RequestBody ConsultaHistoricoDTO dto) {
 		Optional<Paciente> paciente = pacienteRepository.findById(dto.getId());
 		Optional<Medico> medico = medicoRepository.findById(dto.getId());
@@ -110,8 +114,9 @@ public class ConsultaHistoricoController {
 				savedConsulta.getTelefoneConsultorio(),
 				savedConsulta.getValorConsulta()));
 	}
-
+	
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<ConsultaHistoricoDTO> atualizarConsultaHistorico(@PathVariable Integer id,
 			@RequestBody ConsultaHistoricoDTO dto) {
 		Optional<ConsultaHistorico> optionalConsulta = consultaHistoricoRepository.findById(id);
@@ -158,6 +163,7 @@ public class ConsultaHistoricoController {
 	}
 
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<?> deletarConsultaHistorico(@PathVariable Integer id) {
 		return consultaHistoricoRepository.findById(id)
 				.map(consulta -> {

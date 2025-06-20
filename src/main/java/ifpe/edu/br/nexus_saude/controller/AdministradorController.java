@@ -146,7 +146,7 @@ public class AdministradorController {
 	public List<DiasAtendimentoDTO> listarDiasAtendimento() {
 		return diasAtendimentoRepository.findAll().stream().map(DiasAtendimentoDTO::new).toList();
 	}
-	
+
 	@PreAuthorize("permitAll()") 
 	@GetMapping("/dashboard-stats")
 	public Map<String, Integer> getDashboardStats() {
@@ -158,7 +158,6 @@ public class AdministradorController {
 
 		return stats;
 	}
-
 
 
 	@PutMapping("/redefinir-senha/{adminId}")

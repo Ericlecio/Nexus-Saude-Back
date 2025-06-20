@@ -3,6 +3,7 @@ package ifpe.edu.br.nexus_saude.controller;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ public class ConsultaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
     public ResponseEntity<ConsultaDTO> criarConsulta(@RequestBody ConsultaDTO dto) {
         Optional<Paciente> paciente = pacienteRepository.findById(dto.getPacienteId());
         Optional<Medico> medico = medicoRepository.findById(dto.getMedicoId());
