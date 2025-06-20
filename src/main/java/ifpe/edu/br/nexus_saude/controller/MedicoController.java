@@ -104,7 +104,7 @@ public class MedicoController {
 	}
 
 	@GetMapping("/listar")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public List<MedicoDTO> getMedicos() {
 		return medicoRepository.findAll()
 				.stream()
@@ -167,16 +167,18 @@ public class MedicoController {
 					medico.setTempoConsulta(medicoAtualizadoDTO.getTempoConsulta());
 					medico.setUf(medicoAtualizadoDTO.getUf());
 					medico.setValorConsulta(medicoAtualizadoDTO.getValorConsulta());
-					
+
 					// --- INÍCIO DA CORREÇÃO ---
 					// 1. Limpa a lista de dias de atendimento existente do médico.
-					// A cascata (CascadeType.ALL) na entidade Medico garantirá que eles sejam removidos do banco.
+					// A cascata (CascadeType.ALL) na entidade Medico garantirá que eles sejam
+					// removidos do banco.
 					if (medico.getDiasAtendimento() != null) {
 						medico.getDiasAtendimento().clear();
 					}
 
 					// 2. Adiciona os novos dias de atendimento que vieram na requisição.
-					if (medicoAtualizadoDTO.getDiasAtendimento() != null && !medicoAtualizadoDTO.getDiasAtendimento().isEmpty()) {
+					if (medicoAtualizadoDTO.getDiasAtendimento() != null
+							&& !medicoAtualizadoDTO.getDiasAtendimento().isEmpty()) {
 						List<DiasAtendimento> novosDias = medicoAtualizadoDTO.getDiasAtendimento().stream().map(dto -> {
 							DiasAtendimento dia = new DiasAtendimento();
 							dia.setMedico(medico); // Re-vincula ao médico

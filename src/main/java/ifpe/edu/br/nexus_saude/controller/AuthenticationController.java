@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
-	@Autowired
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -30,9 +30,7 @@ public class AuthenticationController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
-                        loginRequest.getSenha()
-                )
-        );
+                        loginRequest.getSenha()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

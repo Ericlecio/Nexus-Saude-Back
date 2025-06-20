@@ -56,7 +56,7 @@ public class AgendamentoController {
 	}
 
 	@GetMapping("/medico/{medicoId}")
-	@PreAuthorize("hasAnyRole('ADMIN','MEDICO')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'PACIENTE')")
 	public List<AgendamentoDTO> listarPorMedico(@PathVariable Integer medicoId) {
 		return agendamentoRepository.findByMedicoIdAndDataAfter(medicoId, LocalDateTime.now())
 				.stream()
