@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/paciente")
@@ -108,6 +109,20 @@ public class PacienteController {
 		}
 	}
 
+	@GetMapping("/email/{email}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
+	public ResponseEntity<PacienteDTO> getPacientePorEmail(@PathVariable String email) {
+		Optional<Paciente> pacienteOpt = pacienteRepository.findAll().stream()
+				.filter(p -> p.getUsuario() != null && p.getUsuario().getEmail().equalsIgnoreCase(email))
+				.findFirst();
+
+		if (pacienteOpt.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		return ResponseEntity.ok(new PacienteDTO(pacienteOpt.get()));
+	}
+
 	@PutMapping("/update/{pacienteId}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
 	public ResponseEntity<PacienteDTO> updatePaciente(@PathVariable Integer pacienteId,
@@ -115,14 +130,13 @@ public class PacienteController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
 
-
 		return pacienteRepository.findById(pacienteId)
 				.map(paciente -> {
 					boolean isAdmin = authentication.getAuthorities().stream()
 							.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
 					if (!isAdmin && !paciente.getUsuario().getEmail().equals(currentPrincipalName)) {
-						
+
 						return ResponseEntity.status(HttpStatus.FORBIDDEN).<PacienteDTO>build();
 					}
 
