@@ -68,7 +68,9 @@ public class SecurityConfig {
                         .hasAnyRole("ADMIN", "PACIENTE", "MEDICO")
                         .requestMatchers(HttpMethod.GET, "/agendamento/medico/**")
                         .hasAnyRole("PACIENTE", "MEDICO", "ADMIN")
-                        .requestMatchers("/agendamento/**").hasAnyRole("MEDICO", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/agendamento/inserir")
+                        .hasAnyRole("PACIENTE", "MEDICO", "ADMIN")
+                        .requestMatchers("/agendamento/**").hasAnyRole("MEDICO", "ADMIN") // mantém o restante restrito
                         .requestMatchers("/DiasAtendimento/**").hasAnyRole("MEDICO", "ADMIN")
                         .requestMatchers("/consultas/**").hasAnyRole("PACIENTE", "MEDICO", "ADMIN")
                         .requestMatchers("/consulta-historico/**").hasAnyRole("PACIENTE", "MEDICO", "ADMIN")
