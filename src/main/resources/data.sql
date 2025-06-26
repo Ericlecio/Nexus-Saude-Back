@@ -8,7 +8,7 @@ INSERT INTO papeis (id, nome) VALUES (1, 'PACIENTE'), (2, 'MEDICO'), (3, 'ADMIN'
 
 -- Usuário ADMIN padrão (ID: 11)
 INSERT INTO usuarios (id, email, senha, ativo) VALUES
-(11, 'admin@nexus.com', '123456', true);
+(11, 'admin@nexus.com', '$2a$10$0ITvqbgsj1d4U6eKHdSM6utNeohSwFjPx65J0t/TAHNKBlqZzSD3y', true);
 
 -- Associar papel ADMIN ao usuário admin (papel_id = 3)
 INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (11, 3);
