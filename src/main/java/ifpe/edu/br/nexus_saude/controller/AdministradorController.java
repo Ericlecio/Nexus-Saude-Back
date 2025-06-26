@@ -132,6 +132,34 @@ public class AdministradorController {
 		return pacienteRepository.findAll().stream().map(PacienteDTO::new).toList();
 	}
 
+	@PutMapping("/update/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> atualizarPaciente(@PathVariable Integer id, @RequestBody PacienteDTO dto) {
+		return pacienteRepository.findById(id)
+				.map(paciente -> {
+					Usuario usuario = paciente.getUsuario();
+
+					if (!usuario.getEmail().equalsIgnoreCase(dto.getEmail())) {
+						if (usuarioRepository.existsByEmail(dto.getEmail())) {
+							return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail já está em uso.");
+						}
+						usuario.setEmail(dto.getEmail());
+					}
+
+					paciente.setNomeCompleto(dto.getNomeCompleto());
+					paciente.setCpf(dto.getCpf());
+					paciente.setTelefone(dto.getTelefone());
+					paciente.setDataNascimento(dto.getDataNascimento());
+					paciente.setPlanoSaude(dto.getPlanoSaude());
+
+					usuarioRepository.save(usuario);
+					pacienteRepository.save(paciente);
+
+					return ResponseEntity.ok("Paciente atualizado com sucesso.");
+				})
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente não encontrado."));
+	}
+
 	@GetMapping("/agendamentos")
 	public List<AgendamentoDTO> listarAgendamentos() {
 		return agendamentoRepository.findAll().stream().map(AgendamentoDTO::new).toList();
@@ -147,7 +175,7 @@ public class AdministradorController {
 		return diasAtendimentoRepository.findAll().stream().map(DiasAtendimentoDTO::new).toList();
 	}
 
-	@PreAuthorize("permitAll()") 
+	@PreAuthorize("permitAll()")
 	@GetMapping("/dashboard-stats")
 	public Map<String, Integer> getDashboardStats() {
 		Map<String, Integer> stats = new HashMap<>();
@@ -158,7 +186,6 @@ public class AdministradorController {
 
 		return stats;
 	}
-
 
 	@PutMapping("/redefinir-senha/{adminId}")
 	@PreAuthorize("hasRole('ADMIN')")

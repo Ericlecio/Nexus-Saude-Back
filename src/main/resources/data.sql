@@ -4,15 +4,25 @@ INSERT INTO situacao_agendamento (descricao) VALUES ('Cancelado');
 INSERT INTO situacao_agendamento (descricao) VALUES ('Finalizado');
 
 -- Papeis (Roles)
-INSERT INTO papeis (nome) VALUES ('PACIENTE'), ('MEDICO'), ('ADMIN');
+INSERT INTO papeis (id, nome) VALUES (1, 'PACIENTE'), (2, 'MEDICO'), (3, 'ADMIN');
+
+-- Usuário ADMIN padrão (ID: 11)
+INSERT INTO usuarios (id, email, senha, ativo) VALUES
+(11, 'admin@nexus.com', '123456', true);
+
+-- Associar papel ADMIN ao usuário admin (papel_id = 3)
+INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (11, 3);
+
+-- Inserir admin na tabela correta (admin)
+INSERT INTO admin (usuario_id) VALUES (11);
 
 -- Usuários para os Pacientes
-INSERT INTO usuarios (email, senha, ativo) VALUES
-('maria.silva@example.com', '$2a$10$HASHFICTICIO1', true),
-('joao.souza@example.com', '$2a$10$HASHFICTICIO1', true),
-('ana.costa@example.com', '$2a$10$HASHFICTICIO1', true),
-('bruno.oliveira@example.com', '$2a$10$HASHFICTICIO1', true),
-('luciana.martins@example.com', '$2a$10$HASHFICTICIO1', true);
+INSERT INTO usuarios (id, email, senha, ativo) VALUES
+(1, 'maria.silva@example.com', '$2a$10$HASHFICTICIO1', true),
+(2, 'joao.souza@example.com', '$2a$10$HASHFICTICIO1', true),
+(3, 'ana.costa@example.com', '$2a$10$HASHFICTICIO1', true),
+(4, 'bruno.oliveira@example.com', '$2a$10$HASHFICTICIO1', true),
+(5, 'luciana.martins@example.com', '$2a$10$HASHFICTICIO1', true);
 
 -- Associar Papel de PACIENTE aos usuários
 INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (1, 1), (2, 1), (3, 1), (4, 1), (5, 1);
@@ -29,12 +39,12 @@ INSERT INTO paciente (
 (5, 'Luciana Martins', '(81)99444-5678', '567.890.123-44', '1995-07-25', 'SulAmérica', NOW(), NOW(), NOW());
 
 -- Usuários para os Médicos
-INSERT INTO usuarios (email, senha, ativo) VALUES
-('roberto.lima@example.com', '$2a$10$HASHFICTICIO1', true),
-('fernanda.alves@example.com', '$2a$10$HASHFICTICIO1', true),
-('paulo.medeiros@example.com', '$2a$10$HASHFICTICIO1', true),
-('juliana.ramos@example.com', '$2a$10$HASHFICTICIO1', true),
-('marcelo.teixeira@example.com', '$2a$10$HASHFICTICIO1', true);
+INSERT INTO usuarios (id, email, senha, ativo) VALUES
+(6, 'roberto.lima@example.com', '$2a$10$HASHFICTICIO1', true),
+(7, 'fernanda.alves@example.com', '$2a$10$HASHFICTICIO1', true),
+(8, 'paulo.medeiros@example.com', '$2a$10$HASHFICTICIO1', true),
+(9, 'juliana.ramos@example.com', '$2a$10$HASHFICTICIO1', true),
+(10, 'marcelo.teixeira@example.com', '$2a$10$HASHFICTICIO1', true);
 
 -- Associar Papel de MEDICO aos usuários
 INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (6, 2), (7, 2), (8, 2), (9, 2), (10, 2);

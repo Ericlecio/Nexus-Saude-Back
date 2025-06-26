@@ -18,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -151,6 +152,35 @@ public class PacienteController {
 
 				})
 				.orElse(ResponseEntity.notFound().build());
+	}
+
+	@PutMapping("/update/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
+	public ResponseEntity<?> atualizarPaciente(@PathVariable Integer id, @RequestBody PacienteDTO dto) {
+		return pacienteRepository.findById(id).map(paciente -> {
+			Usuario usuario = paciente.getUsuario();
+
+			// Verifica se o e-mail foi alterado e se já está em uso por outro usuário
+			if (!usuario.getEmail().equalsIgnoreCase(dto.getEmail())) {
+				if (usuarioRepository.existsByEmail(dto.getEmail())) {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail já está em uso.");
+				}
+				usuario.setEmail(dto.getEmail());
+			}
+
+			// Atualiza os campos do paciente
+			paciente.setNomeCompleto(dto.getNomeCompleto());
+			paciente.setCpf(dto.getCpf());
+			paciente.setTelefone(dto.getTelefone());
+			paciente.setDataNascimento(dto.getDataNascimento());
+			paciente.setPlanoSaude(dto.getPlanoSaude());
+			paciente.setUpdatedAt(LocalDateTime.now());
+
+			usuarioRepository.save(usuario);
+			pacienteRepository.save(paciente);
+
+			return ResponseEntity.ok(new PacienteDTO(paciente));
+		}).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente não encontrado."));
 	}
 
 	@DeleteMapping("/deletar/{pacienteId}")

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,38 +38,42 @@ public class UsuarioController {
                 .map(p -> p.getNome())
                 .orElse("DESCONHECIDO");
 
-        String nomeCompleto = null;
-        Integer idEspecifico = null;
+        Map<String, Object> response = new HashMap<>();
+        response.put("email", usuario.getEmail());
+        response.put("papel", papel);
 
         if (papel.equalsIgnoreCase("PACIENTE")) {
             Optional<Paciente> paciente = pacienteRepository.findAll().stream()
                     .filter(p -> p.getUsuario().getId().equals(usuario.getId()))
                     .findFirst();
 
-            if (paciente.isPresent()) {
-                nomeCompleto = paciente.get().getNomeCompleto();
-                idEspecifico = paciente.get().getPacienteId();
+            if (paciente.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente não encontrado.");
             }
+
+            response.put("nomeCompleto", paciente.get().getNomeCompleto());
+            response.put("id", paciente.get().getPacienteId());
 
         } else if (papel.equalsIgnoreCase("MEDICO")) {
             Optional<Medico> medico = medicoRepository.findAll().stream()
                     .filter(m -> m.getUsuario().getId().equals(usuario.getId()))
                     .findFirst();
 
-            if (medico.isPresent()) {
-                nomeCompleto = medico.get().getNome();
-                idEspecifico = medico.get().getId();
+            if (medico.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Médico não encontrado.");
             }
 
+            response.put("nomeCompleto", medico.get().getNome());
+            response.put("id", medico.get().getId());
+
         } else if (papel.equalsIgnoreCase("ADMIN")) {
-            nomeCompleto = "Administrador";
+            response.put("nomeCompleto", "Administrador");
+            response.put("id", usuario.getId());
+
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tipo de usuário não reconhecido.");
         }
 
-        return ResponseEntity.ok(Map.of(
-                "email", usuario.getEmail(),
-                "papel", papel,
-                "nomeCompleto", nomeCompleto,
-                "id", idEspecifico
-        ));
+        return ResponseEntity.ok(response);
     }
 }
