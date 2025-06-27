@@ -5,10 +5,12 @@ import ifpe.edu.br.nexus_saude.model.Agendamento;
 import ifpe.edu.br.nexus_saude.model.Medico;
 import ifpe.edu.br.nexus_saude.model.Paciente;
 import ifpe.edu.br.nexus_saude.model.SituacaoAgendamento;
+import ifpe.edu.br.nexus_saude.model.Usuario;
 import ifpe.edu.br.nexus_saude.repository.AgendamentoRepository;
 import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
 import ifpe.edu.br.nexus_saude.repository.PacienteRepository;
 import ifpe.edu.br.nexus_saude.repository.SituacaoAgendamentoRepository;
+import org.springframework.security.core.Authentication;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,7 @@ public class AgendamentoController {
 	@Autowired
 	private SituacaoAgendamentoRepository situacaoRepository;
 
+	// Método para listar todos os agendamentos
 	@GetMapping("/listar")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public List<AgendamentoDTO> listar() {
@@ -47,6 +50,25 @@ public class AgendamentoController {
 				.toList();
 	}
 
+	@GetMapping("/listarPaciente")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE')")
+	public ResponseEntity<List<AgendamentoDTO>> listarAgendamentosPorPaciente(Authentication authentication) {
+		Usuario usuario = (Usuario) authentication.getPrincipal();
+		Optional<Paciente> paciente = pacienteRepository.findByUsuarioId(usuario.getId());
+
+		if (paciente.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+		List<Agendamento> agendamentos = agendamentoRepository.findByPaciente(paciente.get());
+		List<AgendamentoDTO> agendamentosDTO = agendamentos.stream()
+				.map(AgendamentoDTO::new)
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(agendamentosDTO);
+	}
+
+	// Método para buscar um agendamento específico por ID
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<AgendamentoDTO> obterPorId(@PathVariable Integer id) {
@@ -55,6 +77,7 @@ public class AgendamentoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
+	// Método para listar agendamentos de um médico
 	@GetMapping("/medico/{medicoId}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'PACIENTE')")
 	public List<AgendamentoDTO> listarPorMedico(@PathVariable Integer medicoId) {
@@ -64,6 +87,7 @@ public class AgendamentoController {
 				.toList();
 	}
 
+	// Método para inserir um novo agendamento
 	@PostMapping("/inserir")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<?> inserir(@RequestBody AgendamentoDTO dto) {
@@ -98,6 +122,7 @@ public class AgendamentoController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(new AgendamentoDTO(saved));
 	}
 
+	// Método para atualizar um agendamento existente
 	@PutMapping("/update/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody AgendamentoDTO dto) {
@@ -137,6 +162,7 @@ public class AgendamentoController {
 		return ResponseEntity.ok(new AgendamentoDTO(updated));
 	}
 
+	// Método para deletar um agendamento
 	@DeleteMapping("/deletar/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<?> deletar(@PathVariable Integer id) {
@@ -148,6 +174,7 @@ public class AgendamentoController {
 		return ResponseEntity.noContent().build();
 	}
 
+	// Método para listar agendamentos por médico e situação
 	@GetMapping("/listarPorMedico")
 	@PreAuthorize("hasAnyRole('ADMIN', 'PACIENTE', 'MEDICO')")
 	public ResponseEntity<List<AgendamentoDTO>> listarPorMedico(
@@ -170,5 +197,4 @@ public class AgendamentoController {
 
 		return ResponseEntity.ok(dtos);
 	}
-
 }

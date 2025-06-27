@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 // import ifpe.edu.br.nexus_saude.dto.AgendamentoDTO;
 import ifpe.edu.br.nexus_saude.model.Agendamento;
+import ifpe.edu.br.nexus_saude.model.Paciente;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Integer> {
     List<Agendamento> findByMedicoIdAndDataAfter(Integer medicoId, LocalDateTime data);
@@ -16,5 +17,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Intege
     boolean existsByMedicoIdAndDataAndAgendamentoIdNot(Integer medicoId, LocalDateTime data, Integer agendamentoId);
 
     List<Agendamento> findByMedicoId(Integer medicoId);
+
+    List<Agendamento> findByPaciente(Paciente paciente);
 
 }
