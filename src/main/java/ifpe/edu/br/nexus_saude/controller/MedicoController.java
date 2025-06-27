@@ -1,6 +1,7 @@
 package ifpe.edu.br.nexus_saude.controller;
 
 import ifpe.edu.br.nexus_saude.dto.MedicoDTO;
+import ifpe.edu.br.nexus_saude.dto.MedicoUpdateProfileDTO;
 import ifpe.edu.br.nexus_saude.dto.RegistroMedicoRequestDTO;
 import ifpe.edu.br.nexus_saude.model.DiasAtendimento;
 import ifpe.edu.br.nexus_saude.model.Medico;
@@ -13,9 +14,6 @@ import ifpe.edu.br.nexus_saude.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
-// import ifpe.edu.br.nexus_saude.repository.MedicoRepository;
-// import ifpe.edu.br.nexus_saude.repository.DiasAtendimentoRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,11 +83,11 @@ public class MedicoController {
 		medico.setUf(requestDTO.getUf());
 		medico.setValorConsulta(requestDTO.getValorConsulta());
 
-		// RECEBE OS DIAS DO DTO, CRIA E VINCULA NO MÉDICO
+		
 		if (requestDTO.getDiasAtendimento() != null && !requestDTO.getDiasAtendimento().isEmpty()) {
 			List<DiasAtendimento> dias = requestDTO.getDiasAtendimento().stream().map(dto -> {
 				DiasAtendimento dia = new DiasAtendimento();
-				dia.setMedico(medico); // vincula!
+				dia.setMedico(medico); 
 				dia.setDiaSemana(dto.getDiaSemana());
 				dia.setHorario(dto.getHorario());
 				dia.setCreatedAt(LocalDateTime.now());
@@ -134,7 +132,7 @@ public class MedicoController {
 	@PutMapping("/update/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
 	public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id,
-			@Valid @RequestBody RegistroMedicoRequestDTO medicoAtualizadoDTO) {
+			@Valid @RequestBody MedicoUpdateProfileDTO medicoAtualizadoDTO) { // DTO changed
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
 
@@ -148,6 +146,7 @@ public class MedicoController {
 					}
 
 					Usuario usuario = medico.getUsuario();
+					
 					if (medicoAtualizadoDTO.getEmail() != null
 							&& !medicoAtualizadoDTO.getEmail().equalsIgnoreCase(usuario.getEmail())) {
 						if (usuarioRepository.existsByEmail(medicoAtualizadoDTO.getEmail())) {
@@ -155,49 +154,74 @@ public class MedicoController {
 						}
 						usuario.setEmail(medicoAtualizadoDTO.getEmail());
 					}
-					if (medicoAtualizadoDTO.getSenha() != null && !medicoAtualizadoDTO.getSenha().isEmpty()) {
-						usuario.setSenha(passwordEncoder.encode(medicoAtualizadoDTO.getSenha()));
+					
+					if (medicoAtualizadoDTO.getNome() != null) {
+						medico.setNome(medicoAtualizadoDTO.getNome());
 					}
+					if (medicoAtualizadoDTO.getEspecialidade() != null) {
+						medico.setEspecialidade(medicoAtualizadoDTO.getEspecialidade());
+					}
+					if (medicoAtualizadoDTO.getSexo() != null) {
+						medico.setSexo(medicoAtualizadoDTO.getSexo());
+					}
+					if (medicoAtualizadoDTO.getDataNascimento() != null) {
+						medico.setDataNascimento(medicoAtualizadoDTO.getDataNascimento());
+					}
+					if (medicoAtualizadoDTO.getTelefoneConsultorio() != null) {
+						medico.setTelefoneConsultorio(medicoAtualizadoDTO.getTelefoneConsultorio());
+					}
+					if (medicoAtualizadoDTO.getTempoConsulta() != null) {
+						medico.setTempoConsulta(medicoAtualizadoDTO.getTempoConsulta());
+					}
+					if (medicoAtualizadoDTO.getUf() != null) {
+						medico.setUf(medicoAtualizadoDTO.getUf());
+					}
+					if (medicoAtualizadoDTO.getValorConsulta() != null) {
+						medico.setValorConsulta(medicoAtualizadoDTO.getValorConsulta());
+					}
+					
+					if (medicoAtualizadoDTO.getCpf() != null && !medicoAtualizadoDTO.getCpf().equalsIgnoreCase(medico.getCpf())) {
+					     if (medicoRepository.existsByCpf(medicoAtualizadoDTO.getCpf())) {
+					         throw new RuntimeException("CPF já em uso.");
+					     }
+					     medico.setCpf(medicoAtualizadoDTO.getCpf());
+					 }
+					 if (medicoAtualizadoDTO.getCrm() != null && !medicoAtualizadoDTO.getCrm().equalsIgnoreCase(medico.getCrm())) {
+					     if (medicoRepository.existsByCrm(medicoAtualizadoDTO.getCrm())) {
+					         throw new RuntimeException("CRM já em uso.");
+					     }
+					     medico.setCrm(medicoAtualizadoDTO.getCrm());
+					 }
 
-					medico.setNome(medicoAtualizadoDTO.getNome());
-					medico.setEspecialidade(medicoAtualizadoDTO.getEspecialidade());
-					medico.setSexo(medicoAtualizadoDTO.getSexo());
-					medico.setDataNascimento(medicoAtualizadoDTO.getDataNascimento());
-					medico.setTelefoneConsultorio(medicoAtualizadoDTO.getTelefoneConsultorio());
-					medico.setTempoConsulta(medicoAtualizadoDTO.getTempoConsulta());
-					medico.setUf(medicoAtualizadoDTO.getUf());
-					medico.setValorConsulta(medicoAtualizadoDTO.getValorConsulta());
 
-					// --- INÍCIO DA CORREÇÃO ---
-					// 1. Limpa a lista de dias de atendimento existente do médico.
-					// A cascata (CascadeType.ALL) na entidade Medico garantirá que eles sejam
-					// removidos do banco.
+					
 					if (medico.getDiasAtendimento() != null) {
 						medico.getDiasAtendimento().clear();
 					}
 
-					// 2. Adiciona os novos dias de atendimento que vieram na requisição.
+					
 					if (medicoAtualizadoDTO.getDiasAtendimento() != null
 							&& !medicoAtualizadoDTO.getDiasAtendimento().isEmpty()) {
 						List<DiasAtendimento> novosDias = medicoAtualizadoDTO.getDiasAtendimento().stream().map(dto -> {
 							DiasAtendimento dia = new DiasAtendimento();
-							dia.setMedico(medico); // Re-vincula ao médico
+							dia.setMedico(medico); 
 							dia.setDiaSemana(dto.getDiaSemana());
 							dia.setHorario(dto.getHorario());
 							dia.setCreatedAt(LocalDateTime.now());
 							dia.setUpdatedAt(LocalDateTime.now());
 							return dia;
 						}).collect(Collectors.toList());
-						// Adiciona a nova lista à coleção do médico
+						
 						medico.getDiasAtendimento().addAll(novosDias);
 					}
-					// --- FIM DA CORREÇÃO ---
+					
 
 					Medico updated = medicoRepository.save(medico);
 					return ResponseEntity.ok(new MedicoDTO(updated));
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
+
 
 	@DeleteMapping("/deletar/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
