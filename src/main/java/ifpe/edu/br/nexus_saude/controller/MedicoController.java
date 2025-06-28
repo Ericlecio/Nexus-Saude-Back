@@ -129,6 +129,23 @@ public class MedicoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
+	@GetMapping("/email/{email}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
+	public ResponseEntity<MedicoDTO> getMedicoPorEmail(@PathVariable String email) {
+		Medico medico = medicoRepository.findAll().stream()
+				.filter(m -> m.getUsuario() != null && m.getUsuario().getEmail().equalsIgnoreCase(email))
+				.findFirst()
+				.orElse(null);
+
+		if (medico == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		return ResponseEntity.ok(new MedicoDTO(medico));
+	}
+
+
+
 	@PutMapping("/update/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN', 'MEDICO')")
 	public ResponseEntity<MedicoDTO> updateMedico(@PathVariable Integer id,
