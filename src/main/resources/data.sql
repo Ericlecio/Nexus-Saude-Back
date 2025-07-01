@@ -1,23 +1,23 @@
 -- Situações padrão
-INSERT INTO situacao_agendamento (descricao) VALUES ('Agendado');
-INSERT INTO situacao_agendamento (descricao) VALUES ('Cancelado');
-INSERT INTO situacao_agendamento (descricao) VALUES ('Finalizado');
+INSERT IGNORE  INTO situacao_agendamento (descricao) VALUES ('Agendado');
+INSERT IGNORE  INTO situacao_agendamento (descricao) VALUES ('Cancelado');
+INSERT IGNORE  INTO situacao_agendamento (descricao) VALUES ('Finalizado');
 
 -- Papeis (Roles)
-INSERT INTO papeis (id, nome) VALUES (1, 'PACIENTE'), (2, 'MEDICO'), (3, 'ADMIN');
+INSERT IGNORE INTO papeis (id, nome) VALUES (1, 'PACIENTE'), (2, 'MEDICO'), (3, 'ADMIN');
 
 -- Usuário ADMIN padrão (ID: 11)
-INSERT INTO usuarios (id, email, senha, ativo) VALUES
+INSERT IGNORE  INTO usuarios (id, email, senha, ativo) VALUES
 (11, 'admin@nexus.com', '$2a$10$0ITvqbgsj1d4U6eKHdSM6utNeohSwFjPx65J0t/TAHNKBlqZzSD3y', true);
-
+ 
 -- Associar papel ADMIN ao usuário admin (papel_id = 3)
-INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (11, 3);
+INSERT IGNORE  INTO usuarios_papeis (usuario_id, papel_id) VALUES (11, 3);
 
 -- Inserir admin na tabela correta (admin)
-INSERT INTO admin (usuario_id) VALUES (11);
+INSERT IGNORE  INTO admin (usuario_id) VALUES (11);
 
 -- Usuários para os Pacientes
-INSERT INTO usuarios (id, email, senha, ativo) VALUES
+INSERT IGNORE  INTO usuarios (id, email, senha, ativo) VALUES
 (1, 'maria.silva@example.com', '$2a$10$HASHFICTICIO1', true),
 (2, 'joao.souza@example.com', '$2a$10$HASHFICTICIO1', true),
 (3, 'ana.costa@example.com', '$2a$10$HASHFICTICIO1', true),
@@ -25,10 +25,10 @@ INSERT INTO usuarios (id, email, senha, ativo) VALUES
 (5, 'luciana.martins@example.com', '$2a$10$HASHFICTICIO1', true);
 
 -- Associar Papel de PACIENTE aos usuários
-INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (1, 1), (2, 1), (3, 1), (4, 1), (5, 1);
+INSERT IGNORE  INTO usuarios_papeis (usuario_id, papel_id) VALUES (1, 1), (2, 1), (3, 1), (4, 1), (5, 1);
 
 -- Pacientes
-INSERT INTO paciente (
+INSERT IGNORE  INTO paciente (
   usuario_id, nome_completo, telefone, cpf, data_nascimento,
   plano_saude, data_cadastro, created_at, updated_at
 ) VALUES
@@ -39,7 +39,7 @@ INSERT INTO paciente (
 (5, 'Luciana Martins', '(81)99444-5678', '567.890.123-44', '1995-07-25', 'SulAmérica', NOW(), NOW(), NOW());
 
 -- Usuários para os Médicos
-INSERT INTO usuarios (id, email, senha, ativo) VALUES
+INSERT IGNORE  INTO usuarios (id, email, senha, ativo) VALUES
 (6, 'roberto.lima@example.com', '$2a$10$HASHFICTICIO1', true),
 (7, 'fernanda.alves@example.com', '$2a$10$HASHFICTICIO1', true),
 (8, 'paulo.medeiros@example.com', '$2a$10$HASHFICTICIO1', true),
@@ -47,10 +47,10 @@ INSERT INTO usuarios (id, email, senha, ativo) VALUES
 (10, 'marcelo.teixeira@example.com', '$2a$10$HASHFICTICIO1', true);
 
 -- Associar Papel de MEDICO aos usuários
-INSERT INTO usuarios_papeis (usuario_id, papel_id) VALUES (6, 2), (7, 2), (8, 2), (9, 2), (10, 2);
+INSERT IGNORE  INTO usuarios_papeis (usuario_id, papel_id) VALUES (6, 2), (7, 2), (8, 2), (9, 2), (10, 2);
 
 -- Médicos
-INSERT INTO medico (
+INSERT IGNORE  INTO medico (
   usuario_id, nome, crm, especialidade, cpf, sexo, telefone_consultorio,
   tempo_consulta, uf, valor_consulta, data_nascimento, data_cadastro, created_at, updated_at
 ) VALUES
@@ -61,7 +61,7 @@ INSERT INTO medico (
 (10, 'Marcelo Teixeira', 'CRM-56789', 'Ortopedia', '012.345.678-99', 'M', '(81)98700-5555', 45, 'PE', 320.00, '1979-09-09', NOW(), NOW(), NOW());
 
 -- Dias de Atendimento
-INSERT INTO dias_atendimento (medico_id, dia_semana, horario, created_at, updated_at) VALUES
+INSERT IGNORE  INTO dias_atendimento (medico_id, dia_semana, horario, created_at, updated_at) VALUES
 (1, 'Segunda', '08:00', NOW(), NOW()), (1, 'Segunda', '12:00', NOW(), NOW()),
 (1, 'Quarta', '13:00', NOW(), NOW()), (1, 'Quarta', '17:00', NOW(), NOW()),
 (2, 'Terça', '09:00', NOW(), NOW()), (2, 'Terça', '13:00', NOW(), NOW()),

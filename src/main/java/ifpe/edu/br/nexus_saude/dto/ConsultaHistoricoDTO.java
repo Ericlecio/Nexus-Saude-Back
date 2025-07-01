@@ -26,6 +26,9 @@ public class ConsultaHistoricoDTO {
     private String situacao;
     private String telefoneConsultorio;
     private BigDecimal valorConsulta;
+    private Integer pacienteId;
+    private Integer medicoId;
+    private Integer situacaoId;
 
     public ConsultaHistoricoDTO(ConsultaHistorico consulta) {
         this.id = consulta.getId();
@@ -38,5 +41,8 @@ public class ConsultaHistoricoDTO {
         this.situacao = consulta.getSituacao().getDescricao();
         this.telefoneConsultorio = consulta.getTelefoneConsultorio();
         this.valorConsulta = consulta.getValorConsulta();
+        this.pacienteId = consulta.getPaciente().getPacienteId();
+        this.medicoId = consulta.getMedico().getId();
+        this.situacaoId = consulta.getSituacao().getSituacaoId();
     }
 }
